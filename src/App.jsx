@@ -215,6 +215,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("seo");
   const [copied, setCopied] = useState(false);
   const [fetching, setFetching] = useState(false);
+  const [serpTitle, setSerpTitle] = useState("");
+  const [serpDesc, setSerpDesc] = useState("");
+  const [showSerp, setShowSerp] = useState(false);
 
   const fetchUrl = useCallback(async () => {
     if (!url.trim()) return;
@@ -348,6 +351,90 @@ export default function App() {
               style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "12px 14px", color: "white", fontSize: "14px", fontFamily: "Georgia, serif", outline: "none", boxSizing: "border-box", resize: "vertical", lineHeight: "1.6" }}
               onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
             />
+            {(() => {
+              const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+              const color = words === 0 ? "rgba(255,255,255,0.2)" : words < 400 ? "#ef4444" : words < 800 ? "#f59e0b" : "#22c55e";
+              const label = words === 0 ? "" : words < 400 ? "liian lyhyt" : words < 800 ? "kohtalainen" : "hyvä";
+              return words > 0 ? (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "6px" }}>
+                  <span style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color, fontWeight: "600" }}>{words} sanaa</span>
+                  <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.25)" }}>—</span>
+                  <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)" }}>{label}</span>
+                  <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.15)", marginLeft: "auto" }}>tavoite &gt;800</span>
+                </div>
+              ) : null;
+            })()}
+          </div>
+
+          {/* SERP Preview section */}
+          <div style={{ marginBottom: "16px" }}>
+            <button onClick={() => setShowSerp(s => !s)} style={{
+              background: "none", border: "none", padding: "0", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: "6px",
+              fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.35)",
+              letterSpacing: "0.15em", textTransform: "uppercase"
+            }}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ transform: showSerp ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                <path d="M3 2l4 3-4 3" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              SERP-esikatselu
+            </button>
+            {showSerp && (
+              <div style={{ marginTop: "12px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "6px" }}>
+                      Title <span style={{ color: serpTitle.length > 60 ? "#ef4444" : serpTitle.length > 50 ? "#22c55e" : "rgba(255,255,255,0.2)" }}>{serpTitle.length}/60</span>
+                    </label>
+                    <input value={serpTitle} onChange={e => setSerpTitle(e.target.value)}
+                      placeholder="Sivun otsikko..."
+                      style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "8px 12px", color: "white", fontSize: "13px", fontFamily: "'DM Mono', monospace", outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "6px" }}>
+                      Meta description <span style={{ color: serpDesc.length > 160 ? "#ef4444" : serpDesc.length > 140 ? "#22c55e" : "rgba(255,255,255,0.2)" }}>{serpDesc.length}/160</span>
+                    </label>
+                    <input value={serpDesc} onChange={e => setSerpDesc(e.target.value)}
+                      placeholder="Meta description..."
+                      style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "8px 12px", color: "white", fontSize: "13px", fontFamily: "Georgia, serif", outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
+                    />
+                  </div>
+                </div>
+                {/* Google SERP mockup */}
+                <div style={{ background: "white", borderRadius: "10px", padding: "16px 20px", fontFamily: "Arial, sans-serif" }}>
+                  <div style={{ fontSize: "12px", color: "#4d5156", marginBottom: "2px", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div style={{ width: "16px", height: "16px", borderRadius: "50%", background: "#e8eaed", flexShrink: 0 }}/>
+                    <span style={{ color: "#202124" }}>{url || "https://sinunsivu.fi/blogi/postaus"}</span>
+                  </div>
+                  <div style={{
+                    fontSize: "18px", color: serpTitle.length > 60 ? "#d93025" : "#1a0dab",
+                    marginBottom: "4px", lineHeight: "1.3",
+                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
+                  }}>
+                    {serpTitle || <span style={{ color: "#9aa0a6" }}>Ei otsikkoa — kirjoita title yllä</span>}
+                  </div>
+                  {serpTitle.length > 60 && (
+                    <div style={{ fontSize: "11px", color: "#d93025", marginBottom: "4px", fontFamily: "'DM Mono', monospace" }}>
+                      ⚠ Title liian pitkä ({serpTitle.length} merkkiä) — Google katkaisee sen
+                    </div>
+                  )}
+                  <div style={{
+                    fontSize: "13px", color: "#4d5156", lineHeight: "1.5",
+                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden"
+                  }}>
+                    {serpDesc || <span style={{ color: "#9aa0a6" }}>Ei meta descriptionia — Google generoi oman kuvauksen automaattisesti.</span>}
+                  </div>
+                  {serpDesc.length > 160 && (
+                    <div style={{ fontSize: "11px", color: "#d93025", marginTop: "4px", fontFamily: "'DM Mono', monospace" }}>
+                      ⚠ Description liian pitkä ({serpDesc.length} merkkiä) — Google katkaisee sen
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {error && <div style={{ marginBottom: "16px", padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "8px", fontSize: "13px", color: "#ef4444" }}>{error}</div>}
