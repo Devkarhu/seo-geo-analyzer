@@ -62,18 +62,81 @@ Return ONLY a valid JSON object with this exact structure:
 
 Analyze the actual content provided. Be specific in notes. Scores should reflect real quality. Status must be exactly "pass", "warn", or "fail".`;
 
-const IMPROVE_PROMPT = `You are an expert SEO and GEO content optimizer. You will receive a blog post and a target keyword. Your job is to rewrite the content to maximize both SEO and GEO (Generative Engine Optimization) visibility for that keyword.
+const IMPROVE_PROMPT = `You are an expert SEO and GEO content optimizer. You will receive a blog post and a target keyword. Rewrite the content to maximize SEO and GEO visibility.
 
 Rules:
 - Keep the author's voice, tone, and core message intact
 - Do NOT invent facts, statistics, or sources that don't exist in the original
-- Naturally integrate the target keyword: in the title, first paragraph, subheadings, and throughout the text
+- Naturally integrate the target keyword: in the title, first paragraph, subheadings, and throughout
 - Add a TL;DR block at the very top
 - Convert at least 2 subheadings into question format
-- Add a FAQ section at the end with 3–5 real questions a user might ask
+- Add a FAQ section at the end with 3 to 5 real questions
 - Use bullet points or numbered lists where appropriate
-- Keep content length similar or slightly longer
-- Return ONLY the improved text, no explanations or preamble`;
+
+CRITICAL - Output format with diff markers:
+- Wrap every added or changed word/phrase with [[ADD:the new text]]
+- Wrap every removed word/phrase with [[DEL:the removed text]]
+- Unchanged text stays as-is with NO markers
+- Brand new sections (TL;DR, FAQ) that did not exist: wrap the entire section content in [[ADD:...]]
+- Example: "Talvipyoraily [[DEL:on hauskaa]] [[ADD:aloittelijalle on helpompaa kuin luulet]] Tampereella"
+- Return ONLY the marked-up improved text, no explanations or preamble`;
+
+// Parse [[ADD:...]] and [[DEL:...]] markers into React spans
+function renderDiff(text) {
+  if (!text) return null;
+  const parts = [];
+  const regex = /\[\[(ADD|DEL):([^\]]*)\]\]/g;
+  let last = 0;
+  let match;
+  let key = 0;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > last) {
+      parts.push(<span key={key++}>{text.slice(last, match.index)}</span>);
+    }
+    const type = match[1];
+    const content = match[2];
+    if (type === "ADD") {
+      parts.push(
+        <mark key={key++} style={{
+          background: "rgba(34,197,94,0.25)",
+          color: "#86efac",
+          borderRadius: "3px",
+          padding: "1px 3px",
+          textDecoration: "none",
+          borderBottom: "2px solid rgba(34,197,94,0.6)"
+        }}>{content}</mark>
+      );
+    } else {
+      parts.push(
+        <span key={key++} style={{
+          background: "rgba(239,68,68,0.2)",
+          color: "rgba(252,165,165,0.7)",
+          borderRadius: "3px",
+          padding: "1px 3px",
+          textDecoration: "line-through",
+          textDecorationColor: "rgba(239,68,68,0.7)"
+        }}>{content}</span>
+      );
+    }
+    last = match.index + match[0].length;
+  }
+
+  if (last < text.length) {
+    parts.push(<span key={key++}>{text.slice(last)}</span>);
+  }
+
+  return parts;
+}
+
+// Strip diff markers to get clean improved text for copying
+function stripDiff(text) {
+  return text
+    .replace(/\[\[DEL:[^\]]*\]\]/g, "")
+    .replace(/\[\[ADD:([^\]]*)\]\]/g, "$1")
+    .replace(/  +/g, " ")
+    .trim();
+}
 
 const StatusIcon = ({ status }) => {
   if (status === "pass") return (
@@ -144,7 +207,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [improving, setImproving] = useState(false);
   const [result, setResult] = useState(null);
-  const [improved, setImproved] = useState(null);
+  const [improved, setImproved] = useState(null); // raw with [[ADD:]] [[DEL:]] markers
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("seo");
   const [copied, setCopied] = useState(false);
@@ -175,8 +238,19 @@ export default function App() {
     finally { setImproving(false); }
   }, [content, keyword]);
 
-  const copyImproved = () => { navigator.clipboard.writeText(improved); setCopied(true); setTimeout(() => setCopied(false), 2000); };
-  const useImproved = () => { setContent(improved); setImproved(null); setResult(null); setActiveTab("seo"); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const copyImproved = () => {
+    navigator.clipboard.writeText(stripDiff(improved));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const useImproved = () => {
+    setContent(stripDiff(improved));
+    setImproved(null);
+    setResult(null);
+    setActiveTab("seo");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const passCount = c => c.filter(x => x.status === "pass").length;
   const failCount = c => c.filter(x => x.status === "fail").length;
@@ -187,14 +261,14 @@ export default function App() {
     { id: "geo", label: "GEO" },
     { id: "keyword", label: "Avainsana" },
     { id: "wins", label: "Quick Wins" },
-    ...(improved ? [{ id: "compare", label: "✦ Vertailu" }] : [])
+    ...(improved ? [{ id: "compare", label: "✦ Muutokset" }] : [])
   ];
 
   return (
     <div style={{ minHeight: "100vh", background: "#0a0a0f", fontFamily: "Georgia, serif", color: "white" }}>
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E")`, opacity: 0.6 }}/>
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "780px", margin: "0 auto", padding: "48px 24px 80px" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: "820px", margin: "0 auto", padding: "48px 24px 80px" }}>
 
         {/* Header */}
         <div style={{ marginBottom: "40px" }}>
@@ -208,7 +282,7 @@ export default function App() {
             SEO <span style={{ color: "#6366f1" }}>&</span> GEO<br/>Analyzer
           </h1>
           <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "14px", lineHeight: "1.6" }}>
-            Analysoi, kohdistu avainsanaan ja paranna tekstiä automaattisesti.
+            Analysoi, kohdistu avainsanaan ja paranna tekstiä — muutokset korostettu.
           </p>
         </div>
 
@@ -345,35 +419,41 @@ export default function App() {
                 </div>
               )}
 
+              {/* Diff / compare view */}
               {activeTab === "compare" && improved && (
                 <div>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
                     <div>
-                      <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#a855f7", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "3px" }}>✦ Parannettu versio</div>
-                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>Valitse käytätkö tätä vai alkuperäistä</div>
+                      <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#a855f7", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "6px" }}>✦ Parannettu versio — muutokset korostettu</div>
+                      <div style={{ display: "flex", gap: "16px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ display: "inline-block", width: "12px", height: "12px", borderRadius: "2px", background: "rgba(34,197,94,0.3)", border: "1px solid rgba(34,197,94,0.5)" }}/>
+                          <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", fontFamily: "'DM Mono', monospace" }}>Lisätty</span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ display: "inline-block", width: "12px", height: "12px", borderRadius: "2px", background: "rgba(239,68,68,0.25)", border: "1px solid rgba(239,68,68,0.4)" }}/>
+                          <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", fontFamily: "'DM Mono', monospace" }}>Poistettu</span>
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
+                    <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
                       <button onClick={copyImproved} style={{ padding: "7px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", fontSize: "11px", fontFamily: "'DM Mono', monospace", cursor: "pointer" }}>
-                        {copied ? "✓ Kopioitu" : "Kopioi"}
+                        {copied ? "✓ Kopioitu" : "Kopioi puhdas"}
                       </button>
                       <button onClick={useImproved} style={{ padding: "7px 14px", background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: "8px", color: "#c084fc", fontSize: "11px", fontFamily: "'DM Mono', monospace", cursor: "pointer", fontWeight: "600" }}>
                         Käytä tätä →
                       </button>
                     </div>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                    <div>
-                      <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px", padding: "5px 10px", background: "rgba(255,255,255,0.04)", borderRadius: "6px", display: "inline-block" }}>Alkuperäinen</div>
-                      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "10px", padding: "16px", maxHeight: "420px", overflowY: "auto", fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: "1.7", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                        {content}
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#a855f7", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px", padding: "5px 10px", background: "rgba(168,85,247,0.1)", borderRadius: "6px", display: "inline-block" }}>✦ Parannettu</div>
-                      <div style={{ background: "rgba(168,85,247,0.05)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: "10px", padding: "16px", maxHeight: "420px", overflowY: "auto", fontSize: "13px", color: "rgba(255,255,255,0.85)", lineHeight: "1.7", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                        {improved}
-                      </div>
-                    </div>
+
+                  {/* Diff rendered text */}
+                  <div style={{
+                    background: "rgba(168,85,247,0.04)", border: "1px solid rgba(168,85,247,0.15)",
+                    borderRadius: "12px", padding: "24px",
+                    fontSize: "14px", lineHeight: "1.8", color: "rgba(255,255,255,0.8)",
+                    fontFamily: "Georgia, serif", whiteSpace: "pre-wrap", wordBreak: "break-word"
+                  }}>
+                    {renderDiff(improved)}
                   </div>
                 </div>
               )}
