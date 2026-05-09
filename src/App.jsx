@@ -72,6 +72,9 @@ Rules:
 - Convert at least 2 subheadings into question format
 - Add a FAQ section at the end with 3 to 5 real questions
 - Use bullet points or numbered lists where appropriate
+- Add a meta description line at the very top (before TL;DR) in format: "Meta description: ..." — must be 150–160 characters and include the target keyword
+- Shorten the title to under 60 characters while keeping the target keyword
+- Include the target keyword naturally in the second H2 heading
 
 CRITICAL - Output format with diff markers:
 - Wrap every added or changed word/phrase with [[ADD:the new text]]
