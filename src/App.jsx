@@ -229,6 +229,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("seo");
   const [copied, setCopied] = useState(false);
   const [fetching, setFetching] = useState(false);
+  const [baseline, setBaseline] = useState(null);
   const [serpTitle, setSerpTitle] = useState("");
   const [serpDesc, setSerpDesc] = useState("");
   const [showSerp, setShowSerp] = useState(false);
@@ -252,12 +253,17 @@ export default function App() {
 
   const analyze = useCallback(async () => {
     if (!content.trim()) { setError("Liitä blogipostauksen sisältö kenttään."); return; }
-    setLoading(true); setError(""); setResult(null); setImproved(null);
+    setLoading(true); setError(""); setImproved(null);
     const userMsg = `${url ? `URL: ${url}\n` : ""}${keyword ? `Target keyword: ${keyword}\n` : ""}Content:\n${content}`;
     try {
       const data = await callApi(ANALYZE_PROMPT, userMsg);
       const raw = data.content?.map(b => b.text || "").join("") || "";
-      setResult(JSON.parse(raw.replace(/```json|```/g, "").trim()));
+      const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+      setResult(prev => {
+        if (!prev) setBaseline(null);
+        else setBaseline(prev);
+        return parsed;
+      });
       setActiveTab("seo");
     } catch { setError("Analyysi epäonnistui. Tarkista syöte ja yritä uudelleen."); }
     finally { setLoading(false); }
@@ -300,6 +306,7 @@ export default function App() {
     { id: "keyword", label: "Avainsana" },
     { id: "wins", label: "Quick Wins" },
     { id: "eeat", label: "E-E-A-T" },
+    ...(baseline ? [{ id: "beforeafter", label: "↑ Ennen/Jälkeen" }] : []),
     ...(improved ? [{ id: "compare", label: "✦ Muutokset" }] : [])
   ];
 
@@ -556,6 +563,74 @@ export default function App() {
                 </div>
               )}
 
+
+              {/* Before / After tab */}
+              {activeTab === "beforeafter" && baseline && result && (() => {
+                const metrics = [
+                  { label: "Kokonaispistemäärä", key: "overallScore", color: "#a855f7" },
+                  { label: "SEO", key: "seoScore", color: "#6366f1" },
+                  { label: "GEO", key: "geoScore", color: "#06b6d4" },
+                  { label: "Avainsana", key: "keywordScore", color: "#f59e0b" },
+                  { label: "E-E-A-T", keyFn: r => r.eeat?.score, color: "#22c55e" },
+                ];
+                return (
+                  <div>
+                    <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#a855f7", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "4px" }}>↑ ENNEN / JÄLKEEN</div>
+                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "24px" }}>Pisteiden muutos ensimmäisestä analyysista</div>
+
+                    {metrics.map(m => {
+                      const before = m.keyFn ? m.keyFn(baseline) : baseline[m.key];
+                      const after = m.keyFn ? m.keyFn(result) : result[m.key];
+                      if (!before && !after) return null;
+                      const diff = (after || 0) - (before || 0);
+                      const pct = before ? Math.round((diff / before) * 100) : 0;
+                      const diffColor = diff > 0 ? "#22c55e" : diff < 0 ? "#ef4444" : "rgba(255,255,255,0.3)";
+                      const barBefore = ((before || 0) / 100) * 100;
+                      const barAfter = ((after || 0) / 100) * 100;
+                      return (
+                        <div key={m.key || m.label} style={{ marginBottom: "20px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.7)" }}>{m.label}</span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                              <span style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)" }}>{before} → {after}</span>
+                              <span style={{ fontSize: "13px", fontFamily: "'DM Mono', monospace", fontWeight: "700", color: diffColor }}>
+                                {diff > 0 ? "+" : ""}{diff}
+                                {pct !== 0 && <span style={{ fontSize: "10px", marginLeft: "3px" }}>({diff > 0 ? "+" : ""}{pct}%)</span>}
+                              </span>
+                            </div>
+                          </div>
+                          {/* Stacked bars */}
+                          <div style={{ position: "relative", height: "8px", borderRadius: "4px", background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${barBefore}%`, background: "rgba(255,255,255,0.15)", borderRadius: "4px", transition: "width 0.5s ease" }}/>
+                            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${barAfter}%`, background: m.color, borderRadius: "4px", opacity: 0.7, transition: "width 0.5s ease" }}/>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
+                            <span style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.2)" }}>Ennen</span>
+                            <span style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.2)" }}>Jälkeen</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* Overall verdict */}
+                    {(() => {
+                      const totalBefore = (baseline.overallScore || 0);
+                      const totalAfter = (result.overallScore || 0);
+                      const totalDiff = totalAfter - totalBefore;
+                      return (
+                        <div style={{ marginTop: "8px", padding: "16px", borderRadius: "10px", background: totalDiff > 0 ? "rgba(34,197,94,0.08)" : totalDiff < 0 ? "rgba(239,68,68,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${totalDiff > 0 ? "rgba(34,197,94,0.2)" : totalDiff < 0 ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.08)"}` }}>
+                          <div style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: totalDiff > 0 ? "#22c55e" : totalDiff < 0 ? "#ef4444" : "rgba(255,255,255,0.4)", textAlign: "center" }}>
+                            {totalDiff > 5 ? "✓ Merkittävä parannus — postaus on selvästi optimoitu" :
+                             totalDiff > 0 ? "↑ Pieni parannus — jatka optimointia" :
+                             totalDiff === 0 ? "→ Ei muutosta pisteytyksessä" :
+                             "↓ Pisteet laskivat — tarkista muutokset"}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                );
+              })()}
 
               {/* Diff / compare view */}
               {activeTab === "compare" && improved && (
