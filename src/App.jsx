@@ -214,6 +214,42 @@ export default function App() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("seo");
   const [copied, setCopied] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [techData, setTechData] = useState(null);
+  const [techLoading, setTechLoading] = useState(false);
+
+  const fetchUrl = useCallback(async () => {
+    if (!url.trim()) return;
+    setFetching(true);
+    setError("");
+    try {
+      const res = await fetch("/api/fetch-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      if (data.error) { setError(data.error); }
+      else { setContent(data.text); }
+    } catch { setError("Sivun haku epäonnistui."); }
+    finally { setFetching(false); }
+  }, [url]);
+
+  const fetchTechnical = useCallback(async () => {
+    if (!url.trim()) { setError("Anna URL teknistä analyysia varten."); return; }
+    setTechLoading(true); setError(""); setTechData(null);
+    try {
+      const res = await fetch("/api/technical-seo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      if (data.error) { setError(data.error); }
+      else { setTechData(data); setActiveTab("technical"); }
+    } catch { setError("Tekninen analyysi epäonnistui."); }
+    finally { setTechLoading(false); }
+  }, [url]);
 
   const analyze = useCallback(async () => {
     if (!content.trim()) { setError("Liitä blogipostauksen sisältö kenttään."); return; }
@@ -264,6 +300,7 @@ export default function App() {
     { id: "geo", label: "GEO" },
     { id: "keyword", label: "Avainsana" },
     { id: "wins", label: "Quick Wins" },
+    ...(techData ? [{ id: "technical", label: "⚙ Tekninen" }] : []),
     ...(improved ? [{ id: "compare", label: "✦ Muutokset" }] : [])
   ];
 
@@ -294,10 +331,23 @@ export default function App() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
             <div>
               <label style={{ display: "block", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.35)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "7px" }}>URL (valinnainen)</label>
-              <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://sivu.fi/blogi/postaus"
-                style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "9px 12px", color: "white", fontSize: "13px", fontFamily: "'DM Mono', monospace", outline: "none", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
-              />
+              <div style={{ display: "flex", gap: "8px" }}>
+                <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://sivu.fi/blogi/postaus"
+                  style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "9px 12px", color: "white", fontSize: "13px", fontFamily: "'DM Mono', monospace", outline: "none", boxSizing: "border-box" }}
+                  onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.5)"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
+                  onKeyDown={e => e.key === "Enter" && fetchUrl()}
+                />
+                <button onClick={fetchUrl} disabled={!url.trim() || fetching} style={{
+                  padding: "9px 14px", background: fetching ? "rgba(99,102,241,0.2)" : !url.trim() ? "rgba(255,255,255,0.04)" : "rgba(99,102,241,0.2)",
+                  border: "1px solid " + (!url.trim() ? "rgba(255,255,255,0.08)" : "rgba(99,102,241,0.4)"),
+                  borderRadius: "8px", color: !url.trim() ? "rgba(255,255,255,0.2)" : "#a5b4fc",
+                  fontSize: "11px", fontFamily: "'DM Mono', monospace", fontWeight: "600",
+                  cursor: !url.trim() || fetching ? "not-allowed" : "pointer", whiteSpace: "nowrap",
+                  display: "flex", alignItems: "center", gap: "5px"
+                }}>
+                  {fetching ? <><svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="#a5b4fc" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round"/></svg>Haetaan...</> : "Hae →"}
+                </button>
+              </div>
             </div>
             <div>
               <label style={{ display: "block", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.35)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "7px" }}>
@@ -421,6 +471,99 @@ export default function App() {
                   ))}
                 </div>
               )}
+
+              {/* Technical SEO tab */}
+              {activeTab === "technical" && techData && (() => {
+                const Check = ({ label, status, note, value }) => {
+                  const colors = { pass: "#22c55e", warn: "#f59e0b", fail: "#ef4444", info: "#06b6d4" };
+                  const icons = {
+                    pass: <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#22c55e" fillOpacity="0.15" stroke="#22c55e" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+                    warn: <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" fill="#f59e0b" fillOpacity="0.15" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/><path d="M8 7v3M8 11.5v.5" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+                    fail: <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#ef4444" fillOpacity="0.15" stroke="#ef4444" strokeWidth="1.5"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+                    info: <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#06b6d4" fillOpacity="0.15" stroke="#06b6d4" strokeWidth="1.5"/><path d="M8 7v4M8 5.5v.5" stroke="#06b6d4" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+                  };
+                  return (
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 14px", borderRadius: "8px", background: "rgba(255,255,255,0.03)", borderLeft: `2px solid ${colors[status]}20`, marginBottom: "6px" }}>
+                      <div style={{ marginTop: "1px", flexShrink: 0 }}>{icons[status]}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "8px" }}>
+                          <div style={{ fontSize: "13px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.85)", marginBottom: "2px" }}>{label}</div>
+                          {value && <div style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: colors[status], flexShrink: 0 }}>{value}</div>}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: "1.4" }}>{note}</div>
+                      </div>
+                    </div>
+                  );
+                };
+
+                const td = techData;
+                const titleStatus = td.title.length === 0 ? "fail" : td.title.length > 60 ? "warn" : "pass";
+                const descStatus = td.metaDesc.length === 0 ? "fail" : td.metaDesc.length < 120 ? "warn" : td.metaDesc.length > 160 ? "warn" : "pass";
+
+                return (
+                  <div>
+                    {/* SERP Preview */}
+                    <div style={{ marginBottom: "24px" }}>
+                      <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#06b6d4", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "12px" }}>SERP-ESIKATSELU</div>
+                      <div style={{ background: "white", borderRadius: "10px", padding: "16px 20px", maxWidth: "520px" }}>
+                        <div style={{ fontSize: "12px", color: "#202124", fontFamily: "Arial, sans-serif", marginBottom: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {td.serp.url}
+                        </div>
+                        <div style={{ fontSize: "18px", color: "#1a0dab", fontFamily: "Arial, sans-serif", marginBottom: "4px", lineHeight: "1.3", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {td.serp.title || "Ei otsikkoa"}
+                        </div>
+                        <div style={{ fontSize: "13px", color: "#4d5156", fontFamily: "Arial, sans-serif", lineHeight: "1.5", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                          {td.serp.description || "Ei meta descriptionia — Google generoi oman kuvauksen."}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Meta checks */}
+                    <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "10px" }}>META & RAKENNE</div>
+                    <Check label="Title-otsikko" status={titleStatus} value={`${td.title.length} merkkiä`} note={td.title.value || "Ei otsikkoa"} />
+                    <Check label="Meta description" status={descStatus} value={td.metaDesc.length > 0 ? `${td.metaDesc.length} merkkiä` : "Puuttuu"} note={td.metaDesc.value || "Ei meta descriptionia — lisää 150–160 merkin kuvaus."} />
+                    <Check label="Canonical URL" status={td.canonical ? "pass" : "warn"} note={td.canonical || "Canonical-tagi puuttuu — saattaa aiheuttaa duplicate content -ongelman."} />
+                    <Check label="Robots" status="info" note={td.robots} />
+                    <Check label="Hreflang (monikielisyys)" status={td.hreflang > 0 ? "pass" : "info"} value={td.hreflang > 0 ? `${td.hreflang} kpl` : null} note={td.hreflang > 0 ? `${td.hreflang} kieliversiota määritelty` : "Ei hreflang-tageja — lisää jos sivusto on monikielinen."} />
+
+                    {/* Open Graph */}
+                    <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", textTransform: "uppercase", margin: "20px 0 10px" }}>OPEN GRAPH & SOME</div>
+                    <Check label="OG Title" status={td.openGraph.title ? "pass" : "fail"} note={td.openGraph.title || "og:title puuttuu — some-jakamisessa näkyy väärä otsikko."} />
+                    <Check label="OG Description" status={td.openGraph.description ? "pass" : "fail"} note={td.openGraph.description || "og:description puuttuu."} />
+                    <Check label="OG Image" status={td.openGraph.image ? "pass" : "warn"} note={td.openGraph.image || "og:image puuttuu — some-jako näyttää tyhjän."} />
+                    <Check label="Twitter Card" status={td.twitterCard ? "pass" : "warn"} note={td.twitterCard || "twitter:card puuttuu."} />
+
+                    {/* Headings */}
+                    <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", textTransform: "uppercase", margin: "20px 0 10px" }}>OTSIKKORAKENNE</div>
+                    <Check label="H1-otsikot" status={td.headings.h1s.length === 1 ? "pass" : td.headings.h1s.length === 0 ? "fail" : "warn"} value={`${td.headings.h1s.length} kpl`} note={td.headings.h1s[0] || "Ei H1-otsikkoa."} />
+                    <Check label="H2-otsikot" status={td.headings.h2s.length >= 2 ? "pass" : "warn"} value={`${td.headings.h2s.length} kpl`} note={td.headings.h2s.slice(0,3).join(" · ") || "Ei H2-otsikoita."} />
+
+                    {/* Images */}
+                    <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", textTransform: "uppercase", margin: "20px 0 10px" }}>KUVAT</div>
+                    <Check label="Kuvat yhteensä" status="info" value={`${td.images.total} kpl`} note="Kaikki löydetyt kuvat sivulla." />
+                    <Check label="Kuvat ilman alt-tekstiä" status={td.images.withoutAlt === 0 ? "pass" : "fail"} value={td.images.withoutAlt > 0 ? `${td.images.withoutAlt} kpl` : null} note={td.images.withoutAlt === 0 ? "Kaikilla kuvilla on alt-attribuutti." : `${td.images.withoutAlt} kuvalta puuttuu alt-tagi — lisää kuvaava teksti.`} />
+                    <Check label="Tyhjä alt-teksti" status={td.images.emptyAlt === 0 ? "pass" : "warn"} value={td.images.emptyAlt > 0 ? `${td.images.emptyAlt} kpl` : null} note={td.images.emptyAlt === 0 ? "Ei tyhjiä alt-tekstejä." : `${td.images.emptyAlt} kuvalla on tyhjä alt="" — lisää kuvaukset.`} />
+
+                    {/* Links */}
+                    <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", textTransform: "uppercase", margin: "20px 0 10px" }}>LINKIT</div>
+                    <Check label="Sisäiset linkit" status={td.links.internal >= 3 ? "pass" : "warn"} value={`${td.links.internal} kpl`} note={td.links.internal >= 3 ? "Hyvä sisäinen linkitys." : "Lisää sisäisiä linkkejä muihin blogipostauksiin."} />
+                    <Check label="Ulkoiset linkit" status="info" value={`${td.links.external} kpl`} note="Ulkoiset linkit auktoritatiivisiin lähteisiin parantavat E-E-A-T-signaalia." />
+                    {td.brokenLinks.length > 0 ? (
+                      <Check label="Rikkinäiset linkit" status="fail" value={`${td.brokenLinks.length} kpl`} note={td.brokenLinks.map(l => l.href).join(", ")} />
+                    ) : (
+                      <Check label="Rikkinäiset linkit" status="pass" note="Ei rikkinäisiä linkkejä tarkistetuissa ulkoisissa linkeissä." />
+                    )}
+
+                    {/* Schema */}
+                    <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", textTransform: "uppercase", margin: "20px 0 10px" }}>STRUCTURED DATA</div>
+                    <Check label="JSON-LD Schema" status={td.schema.length > 0 ? "pass" : "fail"} value={td.schema.length > 0 ? td.schema.join(", ") : null} note={td.schema.length > 0 ? `Schema-tyypit: ${td.schema.join(", ")}` : "Ei JSON-LD schemaa — lisää vähintään BlogPosting ja FAQPage."} />
+
+                    {/* Word count */}
+                    <div style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", textTransform: "uppercase", margin: "20px 0 10px" }}>SISÄLTÖ</div>
+                    <Check label="Sanamäärä (arvio)" status={td.wordCount > 800 ? "pass" : td.wordCount > 400 ? "warn" : "fail"} value={`~${td.wordCount} sanaa`} note={td.wordCount > 800 ? "Hyvä pituus hakukonenäkyvyyden kannalta." : "Alle 800 sanaa — lisää sisältöä kattavuuden parantamiseksi."} />
+                  </div>
+                );
+              })()}
 
               {/* Diff / compare view */}
               {activeTab === "compare" && improved && (
