@@ -51,6 +51,20 @@ Return ONLY a valid JSON object with this exact structure:
     ],
     "topIssues": ["Use keyword in first paragraph", "Add keyword to at least 2 more H2 headings", "Increase keyword frequency naturally throughout text"]
   },
+  "eeat": {
+    "score": 58,
+    "checks": [
+      { "id": "author_bio", "label": "Kirjoittajan nimi ja bio", "status": "fail", "note": "Ei kirjoittajan nimeä tai esittelyä tekstissä." },
+      { "id": "first_hand", "label": "Omakohtainen kokemus", "status": "warn", "note": "Tekstissä ei viitata henkilökohtaiseen kokemukseen." },
+      { "id": "publish_date", "label": "Julkaisupäivämäärä", "status": "pass", "note": "Päivämäärä on näkyvissä." },
+      { "id": "external_sources", "label": "Ulkoiset lähteet / linkit", "status": "fail", "note": "Ei linkkejä ulkoisiin auktoritatiivisiin lähteisiin." },
+      { "id": "specific_facts", "label": "Konkreettiset faktat ja luvut", "status": "pass", "note": "Tekstissä on spesifisiä lukuja ja faktoja." },
+      { "id": "expertise_signals", "label": "Asiantuntijuussignaalit", "status": "warn", "note": "Ei viittauksia kirjoittajan taustaan tai kokemukseen." },
+      { "id": "contact_info", "label": "Yhteystiedot / brändi-identiteetti", "status": "warn", "note": "Ei mainintaa brändistä tai yhteystiedoista tekstissä." },
+      { "id": "updated_content", "label": "Sisällön ajantasaisuus", "status": "pass", "note": "Sisältö vaikuttaa ajantasaiselta." }
+    ],
+    "topIssues": ["Lisää kirjoittajan nimi, titteli ja lyhyt bio", "Lisää linkkejä ulkoisiin lähteisiin", "Viittaa omakohtaiseen kokemukseen tekstissä"]
+  },
   "quickWins": [
     "Write a meta description (150–160 chars) with your main keyword",
     "Add FAQ section with 3–5 common questions",
@@ -285,6 +299,7 @@ export default function App() {
     { id: "geo", label: "GEO" },
     { id: "keyword", label: "Avainsana" },
     { id: "wins", label: "Quick Wins" },
+    { id: "eeat", label: "E-E-A-T" },
     ...(improved ? [{ id: "compare", label: "✦ Muutokset" }] : [])
   ];
 
@@ -474,6 +489,7 @@ export default function App() {
                 <ScoreRing score={result.seoScore} label="SEO" color="#6366f1" />
                 <ScoreRing score={result.geoScore} label="GEO" color="#06b6d4" />
                 {keyword && <ScoreRing score={result.keywordScore || 50} label="Avainsana" color="#f59e0b" />}
+                {result.eeat && <ScoreRing score={result.eeat.score || 50} label="E-E-A-T" color="#22c55e" />}
               </div>
             </div>
 
@@ -492,10 +508,10 @@ export default function App() {
 
             <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "24px" }}>
 
-              {(activeTab === "seo" || activeTab === "geo" || activeTab === "keyword") && (() => {
-                const dataMap = { seo: result.seo, geo: result.geo, keyword: result.keyword };
-                const labelMap = { seo: "Search Engine Optimization", geo: "Generative Engine Optimization", keyword: `Kohdennusanalyysi: "${keyword || "—"}"` };
-                const colorMap = { seo: "#6366f1", geo: "#06b6d4", keyword: "#f59e0b" };
+              {(activeTab === "seo" || activeTab === "geo" || activeTab === "keyword" || activeTab === "eeat") && (() => {
+                const dataMap = { seo: result.seo, geo: result.geo, keyword: result.keyword, eeat: result.eeat };
+                const labelMap = { seo: "Search Engine Optimization", geo: "Generative Engine Optimization", keyword: `Kohdennusanalyysi: "${keyword || "—"}"`, eeat: "Experience · Expertise · Authoritativeness · Trust" };
+                const colorMap = { seo: "#6366f1", geo: "#06b6d4", keyword: "#f59e0b", eeat: "#22c55e" };
                 const data = dataMap[activeTab];
                 const accentColor = colorMap[activeTab];
                 if (!data) return <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "13px" }}>Ei dataa.</div>;
