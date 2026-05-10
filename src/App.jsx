@@ -473,8 +473,15 @@ export default function App() {
   const tabColorMap = { seo: "#6366f1", geo: "#06b6d4", keyword: "#f59e0b", eeat: "#22c55e" };
 
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
-  const wcColor = wordCount === 0 ? "rgba(255,255,255,0.2)" : wordCount < 400 ? "#ef4444" : wordCount < 800 ? "#f59e0b" : "#22c55e";
-  const wcLabel = wordCount < 400 ? "liian lyhyt" : wordCount < 800 ? "kohtalainen" : "hyvä";
+  const wcLimits = {
+    blog:      { low: 400, good: 800, lowLabel: "liian lyhyt", midLabel: "kohtalainen", goodLabel: "hyvä", target: ">800" },
+    instagram: { low: 50,  good: 150, lowLabel: "liian lyhyt", midLabel: "hyvä",        goodLabel: "pitkä — harkitse lyhentämistä", target: "100–150" },
+    substack:  { low: 300, good: 600, lowLabel: "liian lyhyt", midLabel: "kohtalainen", goodLabel: "hyvä", target: "600–1200" },
+    linkedin:  { low: 50,  good: 150, lowLabel: "liian lyhyt", midLabel: "hyvä",        goodLabel: "pitkä — tarkista merkkimäärä", target: "100–150 sanaa / 1000–1300 merkkiä" },
+  };
+  const wc = wcLimits[contentType] || wcLimits.blog;
+  const wcColor = wordCount === 0 ? "rgba(255,255,255,0.2)" : wordCount < wc.low ? "#ef4444" : wordCount < wc.good ? "#f59e0b" : wordCount > wc.good * 1.5 && contentType !== "blog" ? "#f59e0b" : "#22c55e";
+  const wcLabel = wordCount < wc.low ? wc.lowLabel : wordCount < wc.good ? wc.midLabel : wc.goodLabel;
 
   // ─── Styles ─────────────────────────────────────────────────────────────────
   const inputStyle = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "9px 12px", color: "white", fontSize: "13px", fontFamily: "'DM Mono', monospace", outline: "none", boxSizing: "border-box" };
@@ -583,7 +590,7 @@ export default function App() {
                 <span style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: wcColor, fontWeight: "600" }}>{wordCount} sanaa</span>
                 <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.2)" }}>—</span>
                 <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)" }}>{wcLabel}</span>
-                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.15)", marginLeft: "auto" }}>tavoite &gt;800</span>
+                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.15)", marginLeft: "auto" }}>tavoite {wc.target}</span>
               </div>
             )}
           </div>
