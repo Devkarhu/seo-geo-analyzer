@@ -617,6 +617,156 @@ export default function App() {
     finally { setImproving(false); }
   }, [content, keyword, contentType]);
 
+
+  const exportPdf = () => {
+    const now = new Date().toLocaleDateString("fi-FI");
+    const ct = CONTENT_TYPES.find(x => x.id === contentType)?.label || contentType;
+
+    const scoreBar = (score, color) =>
+      `<div style="background:#2a2a2a;border-radius:4px;height:8px;margin-top:4px">
+        <div style="background:${color};width:${score}%;height:8px;border-radius:4px"></div>
+      </div>`;
+
+    const scoreCard = (label, score, color) =>
+      `<div style="text-align:center;padding:16px 12px;background:#1e1e1e;border-radius:10px;border:1px solid #333">
+        <div style="font-size:28px;font-weight:700;color:${color};font-family:monospace">${score}</div>
+        <div style="font-size:10px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:0.1em">${label}</div>
+        ${scoreBar(score, color)}
+      </div>`;
+
+    const checkIcon = s => s === "pass" ? "✓" : s === "warn" ? "⚠" : "✗";
+    const checkColor = s => s === "pass" ? "#22c55e" : s === "warn" ? "#f59e0b" : "#ef4444";
+
+    const checksSection = (title, data, color) => {
+      if (!data?.checks) return "";
+      return `<div style="margin-bottom:24px">
+        <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:${color};margin:0 0 12px;font-family:monospace">${title}</h3>
+        ${data.checks.map(ch => `
+          <div style="display:flex;gap:10px;padding:8px 10px;border-radius:6px;background:#1a1a1a;margin-bottom:5px;border-left:3px solid ${checkColor(ch.status)}">
+            <span style="color:${checkColor(ch.status)};font-weight:700;font-size:13px;flex-shrink:0">${checkIcon(ch.status)}</span>
+            <div>
+              <div style="font-size:12px;color:#e8e8e8;font-family:monospace">${ch.label}</div>
+              <div style="font-size:11px;color:#888;margin-top:2px">${ch.note}</div>
+            </div>
+          </div>
+        `).join("")}
+        ${data.topIssues?.length ? `<div style="margin-top:10px;padding:10px 12px;background:#111;border-radius:6px">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#555;margin-bottom:6px">Korjaukset</div>
+          ${data.topIssues.map((i, n) => `<div style="font-size:11px;color:#aaa;margin-bottom:4px"><span style="color:${color};margin-right:6px;font-family:monospace">${String(n+1).padStart(2,"0")}</span>${i}</div>`).join("")}
+        </div>` : ""}
+      </div>`;
+    };
+
+    const beforeAfterSection = () => {
+      if (!baseline) return "";
+      const metrics = [
+        { label: "Kokonais", before: baseline.overallScore, after: result.overallScore, color: "#a855f7" },
+        { label: "SEO", before: baseline.seoScore, after: result.seoScore, color: "#6366f1" },
+        { label: "GEO", before: baseline.geoScore, after: result.geoScore, color: "#06b6d4" },
+        { label: "Avainsana", before: baseline.keywordScore, after: result.keywordScore, color: "#f59e0b" },
+        { label: "E-E-A-T", before: baseline.eeat?.score, after: result.eeat?.score, color: "#22c55e" },
+        { label: "CTA", before: baseline.cta?.score, after: result.cta?.score, color: "#f97316" },
+      ].filter(m => m.before || m.after);
+
+      return `<div style="margin-bottom:24px;padding:16px;background:#1a1a1a;border-radius:10px;border:1px solid #333">
+        <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:#a855f7;margin:0 0 16px;font-family:monospace">↑ ENNEN / JÄLKEEN</h3>
+        ${metrics.map(m => {
+          const diff = (m.after || 0) - (m.before || 0);
+          const dc = diff > 0 ? "#22c55e" : diff < 0 ? "#ef4444" : "#666";
+          return `<div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+              <span style="font-size:11px;color:#aaa;font-family:monospace">${m.label}</span>
+              <div style="display:flex;gap:12px;align-items:center">
+                <span style="font-size:10px;color:#555;font-family:monospace">${m.before || "—"} → ${m.after || "—"}</span>
+                <span style="font-size:13px;font-weight:700;color:${dc};font-family:monospace">${diff > 0 ? "+" : ""}${diff}</span>
+              </div>
+            </div>
+            <div style="background:#2a2a2a;border-radius:3px;height:5px;position:relative">
+              <div style="background:rgba(255,255,255,0.15);width:${m.before || 0}%;height:5px;border-radius:3px;position:absolute"></div>
+              <div style="background:${m.color};opacity:0.8;width:${m.after || 0}%;height:5px;border-radius:3px;position:absolute;transition:width 0.5s"></div>
+            </div>
+          </div>`;
+        }).join("")}
+        <div style="margin-top:12px;padding:10px;border-radius:6px;background:${(result.overallScore - baseline.overallScore) > 0 ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)'};text-align:center;font-size:12px;color:${(result.overallScore - baseline.overallScore) > 0 ? '#22c55e' : '#ef4444'};font-family:monospace">
+          ${(result.overallScore - baseline.overallScore) > 5 ? "✓ Merkittävä parannus" : (result.overallScore - baseline.overallScore) > 0 ? "↑ Pieni parannus" : "→ Ei muutosta"}
+        </div>
+      </div>`;
+    };
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SEO & GEO Raportti — ${result.title || "Analyysi"}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #111; color: #e8e8e8; font-family: Georgia, serif; padding: 40px; max-width: 820px; margin: 0 auto; }
+    @media print {
+      body { padding: 20px; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid #222">
+    <div>
+      <div style="font-size:9px;font-family:monospace;color:#555;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px">DevKarhu · SEO & GEO Analyzer</div>
+      <h1 style="font-size:22px;font-weight:400;color:white;letter-spacing:-0.02em;margin-bottom:6px">${result.title || "Analyysi"}</h1>
+      <div style="font-size:12px;color:#666">${ct} · ${keyword ? 'Avainsana: ' + keyword + ' · ' : ''}${now}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:36px;font-weight:700;color:#a855f7;font-family:monospace">${result.overallScore}</div>
+      <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.1em">Kokonaispistemäärä</div>
+    </div>
+  </div>
+
+  <!-- Score cards -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:28px">
+    ${scoreCard("SEO", result.seoScore, "#6366f1")}
+    ${scoreCard("GEO", result.geoScore, "#06b6d4")}
+    ${keyword ? scoreCard("Avainsana", result.keywordScore || 0, "#f59e0b") : ""}
+    ${result.eeat ? scoreCard("E-E-A-T", result.eeat.score || 0, "#22c55e") : ""}
+    ${result.cta ? scoreCard("CTA", result.cta.score || 0, "#f97316") : ""}
+  </div>
+
+  <!-- Before/After -->
+  ${beforeAfterSection()}
+
+  <!-- Quick Wins -->
+  ${result.quickWins?.length ? `<div style="margin-bottom:24px;padding:16px;background:#1a1a1a;border-radius:10px;border:1px solid #333">
+    <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:#a855f7;margin:0 0 12px;font-family:monospace">Quick Wins</h3>
+    ${result.quickWins.map((w, i) => `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #222">
+      <span style="color:#a855f7;font-family:monospace;font-size:10px;flex-shrink:0;margin-top:1px">${String(i+1).padStart(2,"0")}</span>
+      <span style="font-size:12px;color:#ccc">${w}</span>
+    </div>`).join("")}
+  </div>` : ""}
+
+  <!-- Checks -->
+  ${checksSection("SEO", result.seo, "#6366f1")}
+  ${checksSection("GEO", result.geo, "#06b6d4")}
+  ${keyword ? checksSection('Avainsana: ' + keyword, result.keyword, "#f59e0b") : ""}
+  ${checksSection("E-E-A-T", result.eeat, "#22c55e")}
+  ${checksSection("CTA", result.cta, "#f97316")}
+
+  <!-- Footer -->
+  <div style="margin-top:32px;padding-top:16px;border-top:1px solid #222;text-align:center">
+    <span style="font-size:9px;font-family:monospace;color:#333;letter-spacing:0.1em">DEVKARHU · SEO & GEO ANALYZER · ${now}</span>
+  </div>
+
+  <div class="no-print" style="position:fixed;bottom:24px;right:24px">
+    <button onclick="window.print()" style="padding:12px 24px;background:linear-gradient(135deg,#6366f1,#a855f7);border:none;border-radius:10px;color:white;font-family:monospace;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
+      ⬇ Tallenna PDF
+    </button>
+  </div>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+  };
+
   const copyImproved = () => { navigator.clipboard.writeText(stripDiff(improved)); setCopied(true); setTimeout(() => setCopied(false), 2000); };
   const useImproved = () => { setContent(stripDiff(improved)); setImproved(null); setResult(null); setBaseline(null); setActiveTab("seo"); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
@@ -865,8 +1015,13 @@ export default function App() {
 
             {/* Score rings */}
             <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "12px" }}>
-              <div style={{ textAlign: "center", marginBottom: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
                 <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: t.textFaint, textTransform: "uppercase" }}>{result?.title || "Analysoidaan..."}</span>
+                {result && <button onClick={exportPdf} style={{
+                  padding: "5px 12px", background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)",
+                  borderRadius: "6px", color: "#a5b4fc", fontSize: "10px", fontFamily: "'DM Mono', monospace",
+                  cursor: "pointer", letterSpacing: "0.05em", fontWeight: "600"
+                }}>⬇ PDF</button>}
               </div>
               <div className="scores-row" style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
                 {result && <ScoreRing score={result.overallScore} label="Kokonais" color="#a855f7" />}
