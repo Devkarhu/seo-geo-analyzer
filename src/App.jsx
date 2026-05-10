@@ -63,7 +63,21 @@ Return ONLY valid JSON:
     ],
     "topIssues":["Add author bio","Link to external sources","Reference personal experience"]
   },
-  "quickWins":["Write meta description with keyword","Add FAQ section","Add JSON-LD schema","Add 2–3 internal links","Add TL;DR block"]
+  "cta": {
+    "score": 45,
+    "checks": [
+      {"id":"cta_present","label":"CTA löytyy tekstistä","status":"fail","note":"Ei selkeää kehotusta toimintaan."},
+      {"id":"cta_placement","label":"CTA sijoitettu loppuun","status":"warn","note":"CTA puuttuu tai se on piilotettu tekstin keskelle."},
+      {"id":"cta_product_link","label":"Linkki tuotesivulle tai mallistoon","status":"fail","note":"Ei linkkiä tuotteisiin — lukija ei tiedä mitä tehdä seuraavaksi."},
+      {"id":"cta_urgency","label":"Kiireellisyys tai hyöty CTA:ssa","status":"fail","note":"CTA on geneerinen — lisää konkreettinen hyöty tai syy toimia nyt."},
+      {"id":"cta_contact","label":"Yhteydenotto tai tarjouspyyntö","status":"warn","note":"Ei kehotusta ottaa yhteyttä tai pyytää tarjousta."},
+      {"id":"cta_buying_intent","label":"Ostopolku selkeä","status":"fail","note":"Teksti ei ohjaa lukijaa kohti ostopäätöstä."},
+      {"id":"cta_local","label":"Paikallinen CTA (tule myymälään, testaa)","status":"fail","note":"Ei paikallista kehotusta — lisää jos myymälä on käytettävissä."},
+      {"id":"cta_multiple","label":"Useampi CTA-vaihtoehto","status":"warn","note":"Tarjoa sekä kova CTA (osta nyt) että pehmeä (lue lisää, katso mallisto)."}
+    ],
+    "topIssues":["Lisää selkeä CTA postauksen loppuun","Linkitä suoraan tuotesivulle tai mallistoon","Lisää pehmeä vaihtoehto: tilaa uutiskirje tai tule testaamaan"]
+  },
+  "quickWins":["Write meta description with keyword","Add FAQ section","Add JSON-LD schema","Add 2–3 internal links","Add TL;DR block","Add product link CTA at end of post"]
 }
 Analyze the actual content. Be specific. Status must be exactly "pass", "warn", or "fail".`,
 
@@ -253,7 +267,21 @@ Return ONLY valid JSON:
     ],
     "topIssues":["Mainitse CE-sertifikaatti ja EN15194-standardi","Lisää takuuaika ja huoltopalvelu selkeästi","Lisää oikeiden asiakkaiden arvosteluja"]
   },
-  "quickWins":["Lisää Product schema (hinta, saatavuus, arvosana)","Kirjoita FAQ ostajien yleisimmillä kysymyksillä","Mainitse takuu, huolto ja palautuskäytäntö","Lisää long-tail avainsanat käyttötarkoituksen mukaan","Lisää CE-merkintä ja EN15194-standardi tekstiin"]
+  "cta": {
+    "score": 40,
+    "checks": [
+      {"id":"cta_buy","label":"Selkeä osta-nappi tai CTA","status":"fail","note":"Ei selkeää ostopainiketta tai kehotusta."},
+      {"id":"cta_test","label":"Testiajomahdollisuus mainittu","status":"fail","note":"Ei mainintaa testaamisesta — tärkeä konversiotekijä kalliissa tuotteissa."},
+      {"id":"cta_finance","label":"Rahoitusvaihtoehto mainittu","status":"fail","note":"Osamaksu tai rahoitus voi ratkaista ostopäätöksen — mainitse jos saatavilla."},
+      {"id":"cta_stock","label":"Saatavuustieto (varastossa / tilaustuote)","status":"warn","note":"Ei tietoa saatavuudesta — epävarmuus estää ostamisen."},
+      {"id":"cta_contact","label":"Asiantuntija-apu tarjolla","status":"warn","note":"Lisää: ota yhteyttä asiantuntijaan tai chat-tuki."},
+      {"id":"cta_urgency","label":"Kiireellisyys tai rajoitettu erä","status":"fail","note":"Ei urgencyä — harkitse kampanjaa tai rajoitetun erän mainintaa."},
+      {"id":"cta_compare","label":"Vertailulinkki muihin malleihin","status":"warn","note":"Anna asiakkaalle mahdollisuus vertailla — se pitää heidät sivustolla."},
+      {"id":"cta_local","label":"Nouto myymälästä / paikallinen saatavuus","status":"fail","note":"Mainitse jos tuotteen voi noutaa tai tulla testaamaan paikan päällä."}
+    ],
+    "topIssues":["Mainitse testaamismahdollisuus — kriittinen kalliille tuotteille","Lisää rahoitusvaihtoehto jos saatavilla","Näytä saatavuustieto selkeästi"]
+  },
+  "quickWins":["Lisää Product schema (hinta, saatavuus, arvosana)","Kirjoita FAQ ostajien yleisimmillä kysymyksillä","Mainitse takuu, huolto ja palautuskäytäntö","Lisää long-tail avainsanat käyttötarkoituksen mukaan","Lisää CE-merkintä ja EN15194-standardi tekstiin","Mainitse testiajomahdollisuus ja rahoitusvaihtoehdot"]
 }
 Analyze the actual product description provided. Be specific — reference actual product details when possible. Status must be exactly "pass", "warn", or "fail".`,
 
@@ -601,13 +629,15 @@ export default function App() {
     { id: "keyword", label: "Avainsana" },
     { id: "eeat", label: "E-E-A-T" },
     { id: "wins", label: "Wins" },
+    ...(result?.cta ? [{ id: "cta", label: "CTA" }] : []),
+    ...(result?.cta ? [{ id: "cta", label: "CTA" }] : []),
     ...(baseline ? [{ id: "beforeafter", label: "↑ Muutos" }] : []),
     ...(improved ? [{ id: "compare", label: "✦ Diff" }] : []),
   ];
 
-  const tabDataMap = result ? { seo: result.seo, geo: result.geo, keyword: result.keyword, eeat: result.eeat } : {};
-  const tabLabelMap = { seo: "Search Engine Optimization", geo: "Generative Engine Optimization", keyword: `Avainsana: "${keyword || "—"}"`, eeat: "Experience · Expertise · Authoritativeness · Trust" };
-  const tabColorMap = { seo: "#6366f1", geo: "#06b6d4", keyword: "#f59e0b", eeat: "#22c55e" };
+  const tabDataMap = result ? { seo: result.seo, geo: result.geo, keyword: result.keyword, eeat: result.eeat, cta: result.cta } : {};
+  const tabLabelMap = { seo: "Search Engine Optimization", geo: "Generative Engine Optimization", keyword: `Avainsana: "${keyword || "—"}"`, eeat: "Experience · Expertise · Authoritativeness · Trust", cta: "Call-to-Action — ostopolun selkeys" };
+  const tabColorMap = { seo: "#6366f1", geo: "#06b6d4", keyword: "#f59e0b", eeat: "#22c55e", cta: "#f97316" };
 
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
   const wcLimits = {
@@ -830,6 +860,8 @@ export default function App() {
                 <ScoreRing score={result.geoScore} label="GEO" color="#06b6d4" />
                 {keyword && <ScoreRing score={result.keywordScore || 50} label="Avainsana" color="#f59e0b" />}
                 {result.eeat && <ScoreRing score={result.eeat.score || 50} label="E-E-A-T" color="#22c55e" />}
+                {result.cta && <ScoreRing score={result.cta.score || 50} label="CTA" color="#f97316" />}
+                {result.cta && <ScoreRing score={result.cta.score || 50} label="CTA" color="#f97316" />}
               </div>
             </div>
 
@@ -848,7 +880,7 @@ export default function App() {
             <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)" }}>
 
               {/* SEO / GEO / Keyword / E-E-A-T */}
-              {["seo","geo","keyword","eeat"].includes(activeTab) && (() => {
+              {["seo","geo","keyword","eeat","cta"].includes(activeTab) && (() => {
                 const data = tabDataMap[activeTab];
                 const color = tabColorMap[activeTab];
                 if (!data) return <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "13px" }}>Ei dataa.</div>;
