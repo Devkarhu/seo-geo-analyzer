@@ -523,22 +523,21 @@ export default function App() {
   const [serpDesc, setSerpDesc] = useState("");
   const [showSerp, setShowSerp] = useState(false);
   const [htmlParsed, setHtmlParsed] = useState(false);
-  const [dark, setDark] = useState(true);
 
   const t = {
-    bg: "#0d0d14",
-    surface: "#1a1a2e",
-    surfaceHigh: "#22223a",
+    bg: "#111111",
+    surface: "#1c1c1c",
+    surfaceHigh: "#242424",
     border: "rgba(255,255,255,0.12)",
     borderStrong: "rgba(255,255,255,0.18)",
     text: "#f0f0f8",
     textMuted: "rgba(240,240,248,0.6)",
     textFaint: "rgba(240,240,248,0.35)",
-    input: "#13131f",
+    input: "#161616",
     inputBorder: "rgba(255,255,255,0.15)",
     labelColor: "rgba(240,240,248,0.55)",
     tabInactive: "rgba(240,240,248,0.5)",
-    checkBg: "#1e1e32",
+    checkBg: "#212121",
     checkNote: "rgba(240,240,248,0.55)",
     checkLabel: "#f0f0f8",
     sectionLabel: "rgba(240,240,248,0.4)",
@@ -660,15 +659,7 @@ export default function App() {
               </div>
               <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: t.textMuted, textTransform: "uppercase" }}>DevKarhu</span>
             </div>
-            <button onClick={() => setDark(d => !d)} style={{
-              display: "flex", alignItems: "center", gap: "6px",
-              padding: "6px 12px", borderRadius: "20px",
-              background: t.toggleBg, border: `1px solid ${t.toggleBorder}`,
-              color: t.toggleText, fontSize: "11px", fontFamily: "'DM Mono', monospace",
-              cursor: "pointer", transition: "all 0.2s"
-            }}>
-              {dark ? "☀ Vaalea" : "☾ Tumma"}
-            </button>
+
           </div>
           <h1 style={{ fontSize: "clamp(22px, 5vw, 36px)", fontWeight: "400", lineHeight: "1.1", letterSpacing: "-0.02em", marginBottom: "8px" }}>
             SEO <span style={{ color: "#6366f1" }}>&</span> GEO<br/>Analyzer
