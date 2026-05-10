@@ -80,7 +80,11 @@ Return ONLY valid JSON:
       {"id":"keyword_caption","label":"Keywords in Caption","status":"pass","note":"Good keyword use."},
       {"id":"cta","label":"Call-to-Action","status":"fail","note":"No CTA found."},
       {"id":"alt_text","label":"Alt Text (accessibility)","status":"fail","note":"Alt text not mentioned."},
-      {"id":"length","label":"Caption Length (optimal 138–150 words)","status":"warn","note":"Caption too short."},
+      {"id":"hook_length","label":"Hook (ensimmäiset 125 merkkiä)","status":"warn","note":"Hook ei ole tarpeeksi vahva ennen \"lue lisää\"."},
+      {"id":"length_general","label":"Kokonaispituus (100–150 sanaa)","status":"warn","note":"Optimaalinen engagement-alue on 100–150 sanaa."},
+      {"id":"length_story","label":"Tarina/henkilökohtainen (150–300 sanaa ok)","status":"pass","note":"Pidempi caption toimii jos hook on vahva."},
+      {"id":"length_reel","label":"Reel-caption (alle 50 sanaa suositeltava)","status":"pass","note":"Reelissä video myy — caption lyhyeksi."},
+      {"id":"length_carousel","label":"Carousel-caption (lyhyt, sisältö slideissa)","status":"pass","note":"Carousel-postauksessa caption voi olla minimaalinen."},
       {"id":"emoji","label":"Emoji Usage","status":"pass","note":"Good emoji use."},
       {"id":"line_breaks","label":"Readability / Line Breaks","status":"warn","note":"Could use more breaks."},
       {"id":"location","label":"Location Tag Mentioned","status":"fail","note":"No location reference."}
