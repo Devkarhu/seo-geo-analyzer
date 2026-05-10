@@ -622,37 +622,55 @@ export default function App() {
     const now = new Date().toLocaleDateString("fi-FI");
     const ct = CONTENT_TYPES.find(x => x.id === contentType)?.label || contentType;
 
-    const scoreBar = (score, color) =>
-      `<div style="background:#2a2a2a;border-radius:4px;height:8px;margin-top:4px">
-        <div style="background:${color};width:${score}%;height:8px;border-radius:4px"></div>
+    const ring = (score, label, color) => {
+      const r = 38, circ = 2 * Math.PI * r;
+      const offset = circ - (score / 100) * circ;
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="8"
+            stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"
+            stroke-linecap="round" transform="rotate(-90 50 50)"/>
+          <text x="50" y="46" text-anchor="middle" fill="white" font-size="18" font-weight="700" font-family="monospace">${score}</text>
+          <text x="50" y="60" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="8" font-family="monospace">/100</text>
+        </svg>
+        <span style="font-size:9px;font-family:monospace;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em">${label}</span>
       </div>`;
+    };
 
-    const scoreCard = (label, score, color) =>
-      `<div style="text-align:center;padding:16px 12px;background:#1e1e1e;border-radius:10px;border:1px solid #333">
-        <div style="font-size:28px;font-weight:700;color:${color};font-family:monospace">${score}</div>
-        <div style="font-size:10px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:0.1em">${label}</div>
-        ${scoreBar(score, color)}
-      </div>`;
-
-    const checkIcon = s => s === "pass" ? "✓" : s === "warn" ? "⚠" : "✗";
+    const checkIcon = s => s === "pass"
+      ? `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#22c55e" fill-opacity="0.2" stroke="#22c55e" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      : s === "warn"
+      ? `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" fill="#f59e0b" fill-opacity="0.2" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 7v3M8 11.5v.5" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/></svg>`
+      : `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="1.5"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/></svg>`;
     const checkColor = s => s === "pass" ? "#22c55e" : s === "warn" ? "#f59e0b" : "#ef4444";
 
     const checksSection = (title, data, color) => {
       if (!data?.checks) return "";
-      return `<div style="margin-bottom:24px">
-        <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:${color};margin:0 0 12px;font-family:monospace">${title}</h3>
+      return `<div style="margin-bottom:28px">
+        <div style="font-size:9px;font-family:monospace;color:${color};letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06)">${title}</div>
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <span style="font-size:16px;font-weight:700;color:#22c55e;font-family:monospace">${data.checks.filter(x=>x.status==="pass").length}</span><span style="font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;margin-top:5px">OK</span>
+          <span style="margin:0 4px;color:rgba(255,255,255,0.1)">·</span>
+          <span style="font-size:16px;font-weight:700;color:#f59e0b;font-family:monospace">${data.checks.filter(x=>x.status==="warn").length}</span><span style="font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;margin-top:5px">Varoitus</span>
+          <span style="margin:0 4px;color:rgba(255,255,255,0.1)">·</span>
+          <span style="font-size:16px;font-weight:700;color:#ef4444;font-family:monospace">${data.checks.filter(x=>x.status==="fail").length}</span><span style="font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;margin-top:5px">Ongelma</span>
+        </div>
         ${data.checks.map(ch => `
-          <div style="display:flex;gap:10px;padding:8px 10px;border-radius:6px;background:#1a1a1a;margin-bottom:5px;border-left:3px solid ${checkColor(ch.status)}">
-            <span style="color:${checkColor(ch.status)};font-weight:700;font-size:13px;flex-shrink:0">${checkIcon(ch.status)}</span>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;background:#1c1c1c;border-left:2px solid ${checkColor(ch.status)}40;margin-bottom:5px">
+            <div style="flex-shrink:0;margin-top:1px">${checkIcon(ch.status)}</div>
             <div>
-              <div style="font-size:12px;color:#e8e8e8;font-family:monospace">${ch.label}</div>
-              <div style="font-size:11px;color:#888;margin-top:2px">${ch.note}</div>
+              <div style="font-size:12px;color:#f0f0f8;font-family:monospace;margin-bottom:2px">${ch.label}</div>
+              <div style="font-size:11px;color:rgba(240,240,248,0.5);line-height:1.4">${ch.note}</div>
             </div>
           </div>
         `).join("")}
-        ${data.topIssues?.length ? `<div style="margin-top:10px;padding:10px 12px;background:#111;border-radius:6px">
-          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#555;margin-bottom:6px">Korjaukset</div>
-          ${data.topIssues.map((i, n) => `<div style="font-size:11px;color:#aaa;margin-bottom:4px"><span style="color:${color};margin-right:6px;font-family:monospace">${String(n+1).padStart(2,"0")}</span>${i}</div>`).join("")}
+        ${data.topIssues?.length ? `<div style="margin-top:10px;padding:12px;background:#161616;border-radius:8px">
+          <div style="font-size:9px;font-family:monospace;color:rgba(255,255,255,0.25);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">Tärkeimmät korjaukset</div>
+          ${data.topIssues.map((iss, n) => `<div style="display:flex;gap:8px;margin-bottom:6px">
+            <span style="color:${color};font-family:monospace;font-size:10px;flex-shrink:0;margin-top:1px">${String(n+1).padStart(2,"0")}</span>
+            <span style="font-size:12px;color:rgba(240,240,248,0.6);line-height:1.4">${iss}</span>
+          </div>`).join("")}
         </div>` : ""}
       </div>`;
     };
@@ -667,28 +685,28 @@ export default function App() {
         { label: "E-E-A-T", before: baseline.eeat?.score, after: result.eeat?.score, color: "#22c55e" },
         { label: "CTA", before: baseline.cta?.score, after: result.cta?.score, color: "#f97316" },
       ].filter(m => m.before || m.after);
-
-      return `<div style="margin-bottom:24px;padding:16px;background:#1a1a1a;border-radius:10px;border:1px solid #333">
-        <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:#a855f7;margin:0 0 16px;font-family:monospace">↑ ENNEN / JÄLKEEN</h3>
+      const totalDiff = result.overallScore - baseline.overallScore;
+      return `<div style="background:#1c1c1c;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:20px;margin-bottom:24px">
+        <div style="font-size:9px;font-family:monospace;color:#a855f7;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px">↑ ENNEN / JÄLKEEN</div>
         ${metrics.map(m => {
-          const diff = (m.after || 0) - (m.before || 0);
-          const dc = diff > 0 ? "#22c55e" : diff < 0 ? "#ef4444" : "#666";
-          return `<div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
-              <span style="font-size:11px;color:#aaa;font-family:monospace">${m.label}</span>
-              <div style="display:flex;gap:12px;align-items:center">
-                <span style="font-size:10px;color:#555;font-family:monospace">${m.before || "—"} → ${m.after || "—"}</span>
-                <span style="font-size:13px;font-weight:700;color:${dc};font-family:monospace">${diff > 0 ? "+" : ""}${diff}</span>
+          const diff = (m.after||0)-(m.before||0);
+          const dc = diff>0?"#22c55e":diff<0?"#ef4444":"rgba(255,255,255,0.3)";
+          return `<div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+              <span style="font-size:11px;font-family:monospace;color:rgba(255,255,255,0.6)">${m.label}</span>
+              <div style="display:flex;gap:10px;align-items:center">
+                <span style="font-size:10px;font-family:monospace;color:rgba(255,255,255,0.25)">${m.before||"—"} → ${m.after||"—"}</span>
+                <span style="font-size:13px;font-weight:700;font-family:monospace;color:${dc}">${diff>0?"+":""}${diff}</span>
               </div>
             </div>
-            <div style="background:#2a2a2a;border-radius:3px;height:5px;position:relative">
-              <div style="background:rgba(255,255,255,0.15);width:${m.before || 0}%;height:5px;border-radius:3px;position:absolute"></div>
-              <div style="background:${m.color};opacity:0.8;width:${m.after || 0}%;height:5px;border-radius:3px;position:absolute;transition:width 0.5s"></div>
+            <div style="position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,0.06)">
+              <div style="position:absolute;left:0;top:0;height:6px;border-radius:3px;background:rgba(255,255,255,0.18);width:${m.before||0}%"></div>
+              <div style="position:absolute;left:0;top:0;height:6px;border-radius:3px;background:${m.color};opacity:0.75;width:${m.after||0}%"></div>
             </div>
           </div>`;
         }).join("")}
-        <div style="margin-top:12px;padding:10px;border-radius:6px;background:${(result.overallScore - baseline.overallScore) > 0 ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)'};text-align:center;font-size:12px;color:${(result.overallScore - baseline.overallScore) > 0 ? '#22c55e' : '#ef4444'};font-family:monospace">
-          ${(result.overallScore - baseline.overallScore) > 5 ? "✓ Merkittävä parannus" : (result.overallScore - baseline.overallScore) > 0 ? "↑ Pieni parannus" : "→ Ei muutosta"}
+        <div style="margin-top:14px;padding:12px;border-radius:8px;text-align:center;background:${totalDiff>0?"rgba(34,197,94,0.08)":"rgba(239,68,68,0.08)"};border:1px solid ${totalDiff>0?"rgba(34,197,94,0.2)":"rgba(239,68,68,0.2)"}">
+          <span style="font-size:12px;font-family:monospace;color:${totalDiff>0?"#22c55e":"#ef4444"}">${totalDiff>5?"✓ Merkittävä parannus":totalDiff>0?"↑ Pieni parannus — jatka optimointia":totalDiff===0?"→ Ei muutosta":"↓ Pisteet laskivat — tarkista muutokset"}</span>
         </div>
       </div>`;
     };
@@ -698,64 +716,75 @@ export default function App() {
 <head>
   <meta charset="utf-8">
   <title>SEO & GEO Raportti — ${result.title || "Analyysi"}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #111; color: #e8e8e8; font-family: Georgia, serif; padding: 40px; max-width: 820px; margin: 0 auto; }
+    body { background: #111111; color: #f0f0f8; font-family: Georgia, serif; padding: 48px; max-width: 860px; margin: 0 auto; }
     @media print {
-      body { padding: 20px; }
-      .no-print { display: none; }
+      body { padding: 24px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print { display: none !important; }
+      @page { margin: 1cm; background: #111111; }
     }
   </style>
 </head>
 <body>
+
   <!-- Header -->
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid #222">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.08)">
     <div>
-      <div style="font-size:9px;font-family:monospace;color:#555;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px">DevKarhu · SEO & GEO Analyzer</div>
-      <h1 style="font-size:22px;font-weight:400;color:white;letter-spacing:-0.02em;margin-bottom:6px">${result.title || "Analyysi"}</h1>
-      <div style="font-size:12px;color:#666">${ct} · ${keyword ? 'Avainsana: ' + keyword + ' · ' : ''}${now}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center">
+          <svg width="12" height="12" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h10" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:rgba(255,255,255,0.3);text-transform:uppercase">DevKarhu · SEO & GEO Analyzer</span>
+      </div>
+      <h1 style="font-size:24px;font-weight:400;letter-spacing:-0.02em;margin-bottom:8px;color:white">${result.title || "Analyysi"}</h1>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);font-family:'DM Mono',monospace">
+        ${ct}${keyword ? " · " + keyword : ""} · ${now}
+      </div>
     </div>
-    <div style="text-align:right">
-      <div style="font-size:36px;font-weight:700;color:#a855f7;font-family:monospace">${result.overallScore}</div>
-      <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.1em">Kokonaispistemäärä</div>
+    <div style="text-align:center;flex-shrink:0">
+      ${ring(result.overallScore, "Kokonais", "#a855f7")}
     </div>
   </div>
 
-  <!-- Score cards -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:28px">
-    ${scoreCard("SEO", result.seoScore, "#6366f1")}
-    ${scoreCard("GEO", result.geoScore, "#06b6d4")}
-    ${keyword ? scoreCard("Avainsana", result.keywordScore || 0, "#f59e0b") : ""}
-    ${result.eeat ? scoreCard("E-E-A-T", result.eeat.score || 0, "#22c55e") : ""}
-    ${result.cta ? scoreCard("CTA", result.cta.score || 0, "#f97316") : ""}
+  <!-- Score rings -->
+  <div style="background:#1c1c1c;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:24px;margin-bottom:24px">
+    <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap">
+      ${ring(result.seoScore, "SEO", "#6366f1")}
+      ${ring(result.geoScore, "GEO", "#06b6d4")}
+      ${keyword ? ring(result.keywordScore||0, "Avainsana", "#f59e0b") : ""}
+      ${result.eeat ? ring(result.eeat.score||0, "E-E-A-T", "#22c55e") : ""}
+      ${result.cta ? ring(result.cta.score||0, "CTA", "#f97316") : ""}
+    </div>
   </div>
 
   <!-- Before/After -->
   ${beforeAfterSection()}
 
   <!-- Quick Wins -->
-  ${result.quickWins?.length ? `<div style="margin-bottom:24px;padding:16px;background:#1a1a1a;border-radius:10px;border:1px solid #333">
-    <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:#a855f7;margin:0 0 12px;font-family:monospace">Quick Wins</h3>
-    ${result.quickWins.map((w, i) => `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #222">
-      <span style="color:#a855f7;font-family:monospace;font-size:10px;flex-shrink:0;margin-top:1px">${String(i+1).padStart(2,"0")}</span>
-      <span style="font-size:12px;color:#ccc">${w}</span>
+  ${result.quickWins?.length ? `<div style="background:#1c1c1c;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:20px;margin-bottom:24px">
+    <div style="font-size:9px;font-family:'DM Mono',monospace;color:#a855f7;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px">Quick Wins</div>
+    ${result.quickWins.map((w,i) => `<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 12px;margin-bottom:6px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:8px">
+      <div style="width:20px;height:20px;border-radius:50%;background:rgba(168,85,247,0.2);border:1px solid rgba(168,85,247,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:monospace;font-size:9px;color:#a855f7;font-weight:700">${i+1}</div>
+      <span style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5">${w}</span>
     </div>`).join("")}
   </div>` : ""}
 
-  <!-- Checks -->
-  ${checksSection("SEO", result.seo, "#6366f1")}
-  ${checksSection("GEO", result.geo, "#06b6d4")}
+  <!-- All checks -->
+  ${checksSection("SEO — Search Engine Optimization", result.seo, "#6366f1")}
+  ${checksSection("GEO — Generative Engine Optimization", result.geo, "#06b6d4")}
   ${keyword ? checksSection('Avainsana: ' + keyword, result.keyword, "#f59e0b") : ""}
-  ${checksSection("E-E-A-T", result.eeat, "#22c55e")}
-  ${checksSection("CTA", result.cta, "#f97316")}
+  ${result.eeat ? checksSection("E-E-A-T — Experience · Expertise · Authoritativeness · Trust", result.eeat, "#22c55e") : ""}
+  ${result.cta ? checksSection("CTA — Call-to-Action & Ostopolku", result.cta, "#f97316") : ""}
 
   <!-- Footer -->
-  <div style="margin-top:32px;padding-top:16px;border-top:1px solid #222;text-align:center">
-    <span style="font-size:9px;font-family:monospace;color:#333;letter-spacing:0.1em">DEVKARHU · SEO & GEO ANALYZER · ${now}</span>
+  <div style="margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);text-align:center">
+    <span style="font-size:9px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.15);letter-spacing:0.1em">DEVKARHU · SEO & GEO ANALYZER · ${now}</span>
   </div>
 
   <div class="no-print" style="position:fixed;bottom:24px;right:24px">
-    <button onclick="window.print()" style="padding:12px 24px;background:linear-gradient(135deg,#6366f1,#a855f7);border:none;border-radius:10px;color:white;font-family:monospace;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
+    <button onclick="window.print()" style="padding:12px 24px;background:linear-gradient(135deg,#6366f1,#a855f7);border:none;border-radius:10px;color:white;font-family:'DM Mono',monospace;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
       ⬇ Tallenna PDF
     </button>
   </div>
