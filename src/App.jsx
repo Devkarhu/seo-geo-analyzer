@@ -470,75 +470,37 @@ const callApi = async (systemPrompt, userMsg) => {
 // ─── HTML Parser ─────────────────────────────────────────────────────────────
 
 function parseHtml(html) {
-  // Convert headings
-  let text = html
-    .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, '
-# $1
-')
-    .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, '
-## $1
-')
-    .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, '
-### $1
-')
-    .replace(/<h4[^>]*>([\s\S]*?)<\/h4>/gi, '
-#### $1
-')
-    // Keep links with URL
-    .replace(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, '$2 [$1]')
-    // Keep image src as reference
-    .replace(/<img[^>]+src=["']([^"']+)["'][^>]*alt=["']([^"']*)["'][^>]*\/?>/gi, '
-[Kuva: $2 — $1]
-')
-    .replace(/<img[^>]+alt=["']([^"']*)["'][^>]+src=["']([^"']+)["'][^>]*\/?>/gi, '
-[Kuva: $1 — $2]
-')
-    .replace(/<img[^>]+src=["']([^"']+)["'][^>]*\/?>/gi, '
-[Kuva: $1]
-')
-    // Lists
-    .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '
-- $1')
-    .replace(/<\/ul>|<\/ol>/gi, '
-')
-    // Paragraphs and breaks
-    .replace(/<br\s*\/?>/gi, '
-')
-    .replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '
-$1
-')
-    // Bold/italic — keep text
-    .replace(/<(strong|b)[^>]*>([\s\S]*?)<\/(strong|b)>/gi, '$2')
-    .replace(/<(em|i)[^>]*>([\s\S]*?)<\/(em|i)>/gi, '$2')
-    // Remove scripts, styles, nav, footer, header, aside entirely
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/<nav[\s\S]*?<\/nav>/gi, '')
-    .replace(/<footer[\s\S]*?<\/footer>/gi, '')
-    .replace(/<header[\s\S]*?<\/header>/gi, '')
-    .replace(/<aside[\s\S]*?<\/aside>/gi, '')
-    // Strip remaining tags
-    .replace(/<[^>]+>/g, '')
-    // Decode entities
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&ndash;/g, '–')
-    .replace(/&mdash;/g, '—')
-    // Clean whitespace
-    .replace(/
-{3,}/g, '
-
-')
-    .trim();
-  return text;
+  const NL = String.fromCharCode(10);
+  let t2 = html;
+  t2 = t2.replace(/<script[^]*?<\/script>/gi, "");
+  t2 = t2.replace(/<style[^]*?<\/style>/gi, "");
+  t2 = t2.replace(/<nav[^]*?<\/nav>/gi, "");
+  t2 = t2.replace(/<footer[^]*?<\/footer>/gi, "");
+  t2 = t2.replace(/<header[^]*?<\/header>/gi, "");
+  t2 = t2.replace(/<aside[^]*?<\/aside>/gi, "");
+  t2 = t2.replace(/<h1[^>]*>([^]*?)<\/h1>/gi, NL + "# $1" + NL);
+  t2 = t2.replace(/<h2[^>]*>([^]*?)<\/h2>/gi, NL + "## $1" + NL);
+  t2 = t2.replace(/<h3[^>]*>([^]*?)<\/h3>/gi, NL + "### $1" + NL);
+  t2 = t2.replace(/<a[^>]+href="([^"]+)"[^>]*>([^]*?)<\/a>/gi, "$2 [$1]");
+  t2 = t2.replace(/<a[^>]+href='([^']+)'[^>]*>([^]*?)<\/a>/gi, '$2 [$1]');
+  t2 = t2.replace(/<img[^>]+src="([^"]+)"[^>]*alt="([^"]*)"[^>]*\/?>/gi, NL + "[Kuva: $2 - $1]" + NL);
+  t2 = t2.replace(/<img[^>]+alt="([^"]*)"[^>]+src="([^"]+)"[^>]*\/?>/gi, NL + "[Kuva: $1 - $2]" + NL);
+  t2 = t2.replace(/<img[^>]+src="([^"]+)"[^>]*\/?>/gi, NL + "[Kuva: $1]" + NL);
+  t2 = t2.replace(/<li[^>]*>([^]*?)<\/li>/gi, NL + "- $1");
+  t2 = t2.replace(/<br\s*\/?>/gi, NL);
+  t2 = t2.replace(/<p[^>]*>([^]*?)<\/p>/gi, NL + "$1" + NL);
+  t2 = t2.replace(/<(strong|b)[^>]*>([^]*?)<\/(strong|b)>/gi, "$2");
+  t2 = t2.replace(/<(em|i)[^>]*>([^]*?)<\/(em|i)>/gi, "$2");
+  t2 = t2.replace(/<[^>]+>/g, "");
+  t2 = t2.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+  t2 = t2.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " ");
+  t2 = t2.replace(/&ndash;/g, "-").replace(/&mdash;/g, "--");
+  t2 = t2.replace(/\n\n\n+/g, NL + NL).trim();
+  return t2;
 }
 
 function looksLikeHtml(text) {
-  return /<[a-z][\s\S]*>/i.test(text) && (text.includes('</') || text.includes('/>'));
+  return text.includes("</") && /<[a-z][^>]*>/i.test(text);
 }
 
 // ─── Main App ────────────────────────────────────────────────────────────────
