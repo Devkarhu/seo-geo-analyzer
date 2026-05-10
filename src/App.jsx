@@ -430,7 +430,7 @@ const ScoreRing = ({ score, label, color, small }) => {
           strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
           transform={`rotate(-90 ${cx} ${cx})`} style={{ transition: "stroke-dashoffset 1s ease" }}/>
         <text x={cx} y={cx - 4} textAnchor="middle" fill="white" fontSize={small ? 13 : 16} fontWeight="700" fontFamily="'DM Mono', monospace">{score}</text>
-        <text x={cx} y={cx + 9} textAnchor="middle" fill="rgba(255,255,255,0.35)" fontSize="7" fontFamily="'DM Mono', monospace">/100</text>
+        <text x={cx} y={cx + 9} textAnchor="middle" fill="rgba(200,200,220,0.55)" fontSize="7" fontFamily="'DM Mono', monospace">/100</text>
       </svg>
       <span style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center" }}>{label}</span>
     </div>
@@ -525,26 +525,30 @@ export default function App() {
   const [htmlParsed, setHtmlParsed] = useState(false);
   const [dark, setDark] = useState(true);
 
-  const t = dark ? {
-    bg: "#0a0a0f", surface: "rgba(255,255,255,0.04)", border: "rgba(255,255,255,0.08)",
-    text: "white", textMuted: "rgba(255,255,255,0.38)", textFaint: "rgba(255,255,255,0.2)",
-    input: "rgba(255,255,255,0.05)", inputBorder: "rgba(255,255,255,0.1)",
-    labelColor: "rgba(255,255,255,0.35)", tabInactive: "rgba(255,255,255,0.38)",
-    checkBg: "rgba(255,255,255,0.03)", checkNote: "rgba(255,255,255,0.4)",
-    checkLabel: "rgba(255,255,255,0.85)", sectionLabel: "rgba(255,255,255,0.3)",
-    winsBg: "rgba(168,85,247,0.06)", winsBorder: "rgba(168,85,247,0.15)",
-    diffBg: "rgba(168,85,247,0.04)", diffBorder: "rgba(168,85,247,0.15)",
-    toggleBg: "rgba(255,255,255,0.06)", toggleBorder: "rgba(255,255,255,0.12)", toggleText: "rgba(255,255,255,0.5)",
-  } : {
-    bg: "#f4f4f8", surface: "white", border: "rgba(0,0,0,0.08)",
-    text: "#111", textMuted: "rgba(0,0,0,0.5)", textFaint: "rgba(0,0,0,0.3)",
-    input: "white", inputBorder: "rgba(0,0,0,0.15)",
-    labelColor: "rgba(0,0,0,0.45)", tabInactive: "rgba(0,0,0,0.4)",
-    checkBg: "rgba(0,0,0,0.02)", checkNote: "rgba(0,0,0,0.45)", checkLabel: "#111",
-    sectionLabel: "rgba(0,0,0,0.35)",
-    winsBg: "rgba(168,85,247,0.06)", winsBorder: "rgba(168,85,247,0.2)",
-    diffBg: "rgba(168,85,247,0.03)", diffBorder: "rgba(168,85,247,0.2)",
-    toggleBg: "rgba(0,0,0,0.05)", toggleBorder: "rgba(0,0,0,0.1)", toggleText: "rgba(0,0,0,0.5)",
+  const t = {
+    bg: "#0d0d14",
+    surface: "#1a1a2e",
+    surfaceHigh: "#22223a",
+    border: "rgba(255,255,255,0.12)",
+    borderStrong: "rgba(255,255,255,0.18)",
+    text: "#f0f0f8",
+    textMuted: "rgba(240,240,248,0.6)",
+    textFaint: "rgba(240,240,248,0.35)",
+    input: "#13131f",
+    inputBorder: "rgba(255,255,255,0.15)",
+    labelColor: "rgba(240,240,248,0.55)",
+    tabInactive: "rgba(240,240,248,0.5)",
+    checkBg: "#1e1e32",
+    checkNote: "rgba(240,240,248,0.55)",
+    checkLabel: "#f0f0f8",
+    sectionLabel: "rgba(240,240,248,0.4)",
+    winsBg: "rgba(168,85,247,0.12)",
+    winsBorder: "rgba(168,85,247,0.3)",
+    diffBg: "rgba(168,85,247,0.08)",
+    diffBorder: "rgba(168,85,247,0.25)",
+    toggleBg: "rgba(255,255,255,0.08)",
+    toggleBorder: "rgba(255,255,255,0.15)",
+    toggleText: "rgba(240,240,248,0.6)",
   };
 
   const fetchUrl = useCallback(async () => {
@@ -685,8 +689,8 @@ export default function App() {
                 <button key={t.id} onClick={() => { setContentType(t.id); setResult(null); setBaseline(null); setImproved(null); }} style={{
                   padding: "10px 6px", borderRadius: "10px", border: "1px solid",
                   borderColor: contentType === t.id ? "rgba(99,102,241,0.5)" : "rgba(255,255,255,0.08)",
-                  background: contentType === t.id ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.03)",
-                  color: contentType === t.id ? "white" : "rgba(255,255,255,0.45)",
+                  background: contentType === t.id ? "rgba(99,102,241,0.25)" : t.surfaceHigh,
+                  color: contentType === t.id ? "white" : t.textMuted,
                   fontFamily: "'DM Mono', monospace", fontSize: "11px", cursor: "pointer",
                   display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", transition: "all 0.15s"
                 }}>
@@ -794,7 +798,7 @@ export default function App() {
             </div>
           )}
 
-          {error && <div style={{ marginBottom: "12px", padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "8px", fontSize: "13px", color: "#ef4444" }}>{error}</div>}
+          {error && <div style={{ marginBottom: "12px", padding: "10px 14px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: "8px", fontSize: "13px", color: "#fca5a5" }}>{error}</div>}
 
           {/* Action buttons */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
@@ -844,7 +848,7 @@ export default function App() {
                 <button key={tab.id} className="tab-btn" onClick={() => setActiveTab(tab.id)} style={{
                   background: activeTab === tab.id ? (tab.id === "compare" || tab.id === "beforeafter" ? "rgba(168,85,247,0.3)" : "rgba(99,102,241,0.3)") : "transparent",
                   border: "1px solid " + (activeTab === tab.id ? (tab.id === "compare" || tab.id === "beforeafter" ? "rgba(168,85,247,0.4)" : "rgba(99,102,241,0.4)") : "transparent"),
-                  color: activeTab === tab.id ? "white" : "rgba(255,255,255,0.38)",
+                  color: activeTab === tab.id ? "white" : t.tabInactive,
                 }}>{tab.label}</button>
               ))}
             </div>
@@ -876,7 +880,7 @@ export default function App() {
                         {data.topIssues.map((issue, i) => (
                           <div key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start", marginBottom: "6px" }}>
                             <span style={{ color, fontFamily: "'DM Mono', monospace", fontSize: "10px", marginTop: "2px", flexShrink: 0 }}>{String(i+1).padStart(2,"0")}</span>
-                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", lineHeight: "1.5" }}>{issue}</span>
+                            <span style={{ fontSize: "12px", color: t.textMuted, lineHeight: "1.5" }}>{issue}</span>
                           </div>
                         ))}
                       </>
@@ -893,7 +897,7 @@ export default function App() {
                   {result.quickWins.map((win, i) => (
                     <div key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start", padding: "11px 13px", marginBottom: "6px", background: t.winsBg, border: `1px solid ${t.winsBorder}`, borderRadius: "10px" }}>
                       <div style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Mono', monospace", fontSize: "9px", color: "#a855f7", fontWeight: "700" }}>{i+1}</div>
-                      <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.75)", lineHeight: "1.5" }}>{win}</span>
+                      <span style={{ fontSize: "13px", color: t.text, lineHeight: "1.5" }}>{win}</span>
                     </div>
                   ))}
                 </div>
@@ -921,14 +925,14 @@ export default function App() {
                       return (
                         <div key={m.label} style={{ marginBottom: "18px" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "6px" }}>
-                            <span style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.6)" }}>{m.label}</span>
+                            <span style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: t.textMuted }}>{m.label}</span>
                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                              <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.25)" }}>{before} → {after}</span>
+                              <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.textFaint }}>{before} → {after}</span>
                               <span style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", fontWeight: "700", color: diffColor }}>{diff > 0 ? "+" : ""}{diff}</span>
                             </div>
                           </div>
                           <div style={{ position: "relative", height: "6px", borderRadius: "3px", background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-                            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${before}%`, background: "rgba(255,255,255,0.12)", borderRadius: "3px" }}/>
+                            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${before}%`, background: "rgba(255,255,255,0.2)", borderRadius: "3px" }}/>
                             <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${after}%`, background: m.color, borderRadius: "3px", opacity: 0.7, transition: "width 0.8s ease" }}/>
                           </div>
                         </div>
