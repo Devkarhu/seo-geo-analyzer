@@ -195,6 +195,68 @@ Return ONLY valid JSON:
 }
 Analyze the actual content. Status must be exactly "pass", "warn", or "fail".`,
 
+  ecommerce: `You are an expert e-commerce SEO copywriter specializing in product pages. Analyze the product description for search visibility, conversion, and buyer confidence.
+Return ONLY valid JSON:
+{
+  "overallScore": 70, "seoScore": 65, "geoScore": 68, "keywordScore": 62,
+  "title": "product name", "summary": "one sentence summary",
+  "seo": {
+    "checks": [
+      {"id":"product_title","label":"Tuoteotsikko (50–60 merkkiä, avainsana alussa)","status":"pass","note":"Otsikko on selkeä ja avainsana edessä."},
+      {"id":"meta_desc","label":"Meta Description (150–160 merkkiä)","status":"warn","note":"Meta description puuttuu tai liian lyhyt."},
+      {"id":"primary_kw","label":"Pääavainsana tekstissä (1–2%)","status":"pass","note":"Avainsana esiintyy luontevasti."},
+      {"id":"long_tail","label":"Long-tail avainsanat (esim. sähköpyörä kaupunki aikuinen)","status":"warn","note":"Vain yleisavainsana — lisää tarkentavia hakutermejä."},
+      {"id":"h1_h2","label":"H1 ja H2 rakenne","status":"pass","note":"Selkeä otsikkorakenne."},
+      {"id":"bullet_specs","label":"Tekniset tiedot bullet-listana","status":"fail","note":"Tekniset speksit puuttuvat tai ne ei ole listattu selkeästi."},
+      {"id":"word_count","label":"Tekstin pituus (300–500 sanaa)","status":"warn","note":"Liian lyhyt tuotekuvaus — Google suosii kattavampaa sisältöä."},
+      {"id":"image_alt","label":"Kuva alt-tekstit avainsanalla","status":"fail","note":"Alt-teksteissä ei ole avainsanaa."},
+      {"id":"schema","label":"Product Schema Markup","status":"fail","note":"Ei product schemaa — lisää hinta, saatavuus, arvostelut."},
+      {"id":"url_slug","label":"URL-slug (lyhyt, avainsana mukana)","status":"pass","note":"Siisti URL-rakenne."}
+    ],
+    "topIssues":["Lisää long-tail avainsanat tekstiin","Lisää Product schema (hinta, saatavuus, reviews)","Kirjoita meta description"]
+  },
+  "geo": {
+    "checks": [
+      {"id":"direct_answer","label":"Vastaa ostajan kysymyksiin suoraan","status":"pass","note":"Teksti vastaa keskeisiin kysymyksiin."},
+      {"id":"use_cases","label":"Käyttötilanteet kuvattu","status":"warn","note":"Ei konkreettisia käyttötilanteita (esim. kaupunkiajo, retket)."},
+      {"id":"comparison","label":"Vertailu muihin malleihin / kilpailijoihin","status":"fail","note":"Ei vertailua — tekoäly ei voi suositella ilman kontekstia."},
+      {"id":"faq","label":"UKK / Ostajien kysymykset","status":"fail","note":"Ei FAQ-osiota — lisää yleisimmät ostokysymykset."},
+      {"id":"specs_detail","label":"Tarkat tekniset speksit","status":"pass","note":"Speksit löytyvät."},
+      {"id":"social_proof","label":"Arvostelut / Käyttäjäkokemukset","status":"warn","note":"Ei arvosteluihin viittausta tekstissä."},
+      {"id":"brand_trust","label":"Brändi- ja takuusignaalit","status":"warn","note":"Takuu tai huoltopalvelu ei mainittuna."},
+      {"id":"local","label":"Paikallinen saatavuus (esim. Tampere, Finland)","status":"fail","note":"Ei paikallista kontekstia — lisää jos toimitus/nouto mahdollinen."}
+    ],
+    "topIssues":["Lisää FAQ ostajien yleisimmillä kysymyksillä","Mainitse takuu ja huoltopalvelu","Lisää käyttötilanteet (kaupunki, maasto, pendelöinti)"]
+  },
+  "keyword": {
+    "checks": [
+      {"id":"kw_title","label":"Avainsana otsikossa","status":"pass","note":"Pääavainsana otsikossa."},
+      {"id":"kw_first_para","label":"Avainsana ensimmäisessä kappaleessa","status":"warn","note":"Avainsana puuttuu avauskappaleesta."},
+      {"id":"kw_specs","label":"Avainsana spekseissä","status":"pass","note":"Avainsana toistuu luontevasti."},
+      {"id":"kw_longtail","label":"Long-tail: malli + käyttötarkoitus + kohderyhmä","status":"fail","note":"Esim. 'sähköpyörä naisille kaupunki' tai 'sähköpyörä 250W tavarankuljetus' puuttuu."},
+      {"id":"kw_alt","label":"Avainsana kuva alt-teksteissä","status":"fail","note":"Alt-teksteissä ei avainsanaa."},
+      {"id":"kw_variations","label":"Semanttiset variaatiot (e-pyörä, sähköavusteinen)","status":"warn","note":"Käytä myös synonyymejä luontevasti."}
+    ],
+    "topIssues":["Lisää long-tail avainsanat (malli + käyttö + kohderyhmä)","Käytä synonyymejä: e-pyörä, sähköavusteinen pyörä","Lisää avainsana alt-teksteihin"]
+  },
+  "eeat": {
+    "score": 55,
+    "checks": [
+      {"id":"brand","label":"Brändin asiantuntijuus esillä","status":"warn","note":"Ei mainintaa kaupan asiantuntemuksesta tai historiasta."},
+      {"id":"specs_accurate","label":"Tarkat ja todennetut speksit","status":"pass","note":"Tekniset tiedot ovat konkreettiset."},
+      {"id":"certifications","label":"Sertifikaatit / standardit (CE, EN15194)","status":"fail","note":"Ei mainintaa turvallisuusstandardeista."},
+      {"id":"reviews","label":"Oikeat asiakasarvostelut","status":"warn","note":"Ei arvosteluihin viittausta."},
+      {"id":"warranty","label":"Takuu ja huoltopalvelu","status":"fail","note":"Takuuaika ja huolto mainitsematta."},
+      {"id":"real_photos","label":"Oikeat tuotekuvat (ei stockkuvia)","status":"warn","note":"Ei tietoa kuvien alkuperästä."},
+      {"id":"contact","label":"Yhteystiedot / asiantuntija-apu","status":"warn","note":"Ei mainintaa asiantuntija-avusta ostopäätökseen."},
+      {"id":"updated","label":"Hintatiedot ajantasaiset","status":"pass","note":"Hinta näkyvissä."}
+    ],
+    "topIssues":["Mainitse CE-sertifikaatti ja EN15194-standardi","Lisää takuuaika ja huoltopalvelu selkeästi","Lisää oikeiden asiakkaiden arvosteluja"]
+  },
+  "quickWins":["Lisää Product schema (hinta, saatavuus, arvosana)","Kirjoita FAQ ostajien yleisimmillä kysymyksillä","Mainitse takuu, huolto ja palautuskäytäntö","Lisää long-tail avainsanat käyttötarkoituksen mukaan","Lisää CE-merkintä ja EN15194-standardi tekstiin"]
+}
+Analyze the actual product description provided. Be specific — reference actual product details when possible. Status must be exactly "pass", "warn", or "fail".`,
+
   linkedin: `You are a LinkedIn content optimization expert. Analyze for algorithm reach, engagement, and professional authority.
 Return ONLY valid JSON:
 {
@@ -296,6 +358,17 @@ SUBSTACK (email format):
 - End with one reader question
 - Add TL;DR or key takeaways block
 
+ECOMMERCE / PRODUCT PAGE (conversion + SEO):
+- Title: brand + model + key spec + use case, under 60 chars, primary keyword first
+- First paragraph: lead with the main benefit, not a feature list
+- Bullet specs: motor (W), battery (Wh), range (km), weight (kg), max speed, frame material, brake type — all in one clean list
+- Add use case paragraph: who is this for, what terrain, what trip length
+- Add FAQ section: 4–6 questions real buyers ask (range in cold weather, charging time, suitable for hills, service & warranty)
+- Mention CE certification and EN15194 standard if applicable
+- State warranty duration and service availability clearly
+- Use long-tail keywords naturally: e.g. "sähköpyörä kaupunkiajoon naisille", "sähköavusteinen pyörä 250W"
+- Do NOT use "revolutionary", "cutting-edge", "ultimate" — use specific facts instead
+
 LINKEDIN (algorithm rules):
 - Total post: 1000–1300 characters optimal (hard limit before "see more" is ~210 chars)
 - First 2 lines must be the hook — no context-setting, no preamble
@@ -382,6 +455,7 @@ const CONTENT_TYPES = [
   { id: "instagram", label: "Instagram", icon: "📸" },
   { id: "substack", label: "Substack", icon: "📨" },
   { id: "linkedin", label: "LinkedIn", icon: "💼" },
+  { id: "ecommerce", label: "E-commerce", icon: "🛒" },
 ];
 
 const callApi = async (systemPrompt, userMsg) => {
@@ -478,6 +552,7 @@ export default function App() {
     instagram: { low: 50,  good: 150, lowLabel: "liian lyhyt", midLabel: "hyvä",        goodLabel: "pitkä — harkitse lyhentämistä", target: "100–150" },
     substack:  { low: 300, good: 600, lowLabel: "liian lyhyt", midLabel: "kohtalainen", goodLabel: "hyvä", target: "600–1200" },
     linkedin:  { low: 50,  good: 150, lowLabel: "liian lyhyt", midLabel: "hyvä",        goodLabel: "pitkä — tarkista merkkimäärä", target: "100–150 sanaa / 1000–1300 merkkiä" },
+    ecommerce: { low: 150, good: 300, lowLabel: "liian lyhyt", midLabel: "kohtalainen", goodLabel: "hyvä", target: "300–500 sanaa" },
   };
   const wc = wcLimits[contentType] || wcLimits.blog;
   const wcColor = wordCount === 0 ? "rgba(255,255,255,0.2)" : wordCount < wc.low ? "#ef4444" : wordCount < wc.good ? "#f59e0b" : wordCount > wc.good * 1.5 && contentType !== "blog" ? "#f59e0b" : "#22c55e";
