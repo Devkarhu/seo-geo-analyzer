@@ -846,8 +846,22 @@ export default function App() {
         </div>
 
         {/* Results */}
-        {result && (
-          <div style={{ animation: "fadeIn 0.4s ease" }}>
+        {(result || loading) && (
+          <div style={{ position: "relative", animation: "fadeIn 0.4s ease" }}>
+            {loading && (
+              <div style={{
+                position: "absolute", inset: 0, zIndex: 10,
+                background: "rgba(17,17,17,0.75)", borderRadius: "16px",
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                gap: "14px", backdropFilter: "blur(4px)", minHeight: "200px"
+              }}>
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" style={{ animation: "spin 1s linear infinite" }}>
+                  <circle cx="18" cy="18" r="14" stroke="rgba(255,255,255,0.1)" strokeWidth="3"/>
+                  <path d="M18 4a14 14 0 0 1 14 14" stroke="#6366f1" strokeWidth="3" strokeLinecap="round"/>
+                </svg>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em" }}>Analysoidaan...</span>
+              </div>
+            )}
 
             {/* Score rings */}
             <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "12px" }}>
