@@ -712,18 +712,20 @@ export default function App() {
     };
 
     const html = `<!DOCTYPE html>
-<html>
+<html style="background:#111111">
 <head>
   <meta charset="utf-8">
   <title>SEO & GEO Raportti — ${result.title || "Analyysi"}</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #111111; color: #f0f0f8; font-family: Georgia, serif; padding: 48px; max-width: 860px; margin: 0 auto; }
+    html, body { background: #111111 !important; color: #f0f0f8; font-family: Georgia, serif; }
+    body { padding: 48px; max-width: 860px; margin: 0 auto; }
     @media print {
-      body { padding: 24px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      html, body { background: #111111 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body { padding: 24px; }
       .no-print { display: none !important; }
-      @page { margin: 1cm; background: #111111; }
+      @page { margin: 1cm; size: A4; }
     }
   </style>
 </head>
