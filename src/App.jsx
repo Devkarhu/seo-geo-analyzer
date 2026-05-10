@@ -440,11 +440,11 @@ const ScoreRing = ({ score, label, color, small }) => {
 const CheckRow = ({ check }) => {
   const colors = { pass: "#22c55e", warn: "#f59e0b", fail: "#ef4444" };
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.03)", borderLeft: `2px solid ${colors[check.status]}20`, marginBottom: "5px" }}>
+    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 12px", borderRadius: "8px", background: t.checkBg, borderLeft: `2px solid ${colors[check.status]}30`, marginBottom: "5px" }}>
       <div style={{ marginTop: "1px", flexShrink: 0 }}><StatusIcon status={check.status} /></div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.85)", marginBottom: "2px" }}>{check.label}</div>
-        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", lineHeight: "1.4" }}>{check.note}</div>
+        <div style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: t.checkLabel, marginBottom: "2px" }}>{check.label}</div>
+        <div style={{ fontSize: "11px", color: t.checkNote, lineHeight: "1.4" }}>{check.note}</div>
       </div>
     </div>
   );
@@ -467,6 +467,80 @@ const callApi = async (systemPrompt, userMsg) => {
   return res.json();
 };
 
+// ─── HTML Parser ─────────────────────────────────────────────────────────────
+
+function parseHtml(html) {
+  // Convert headings
+  let text = html
+    .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, '
+# $1
+')
+    .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, '
+## $1
+')
+    .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, '
+### $1
+')
+    .replace(/<h4[^>]*>([\s\S]*?)<\/h4>/gi, '
+#### $1
+')
+    // Keep links with URL
+    .replace(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, '$2 [$1]')
+    // Keep image src as reference
+    .replace(/<img[^>]+src=["']([^"']+)["'][^>]*alt=["']([^"']*)["'][^>]*\/?>/gi, '
+[Kuva: $2 — $1]
+')
+    .replace(/<img[^>]+alt=["']([^"']*)["'][^>]+src=["']([^"']+)["'][^>]*\/?>/gi, '
+[Kuva: $1 — $2]
+')
+    .replace(/<img[^>]+src=["']([^"']+)["'][^>]*\/?>/gi, '
+[Kuva: $1]
+')
+    // Lists
+    .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '
+- $1')
+    .replace(/<\/ul>|<\/ol>/gi, '
+')
+    // Paragraphs and breaks
+    .replace(/<br\s*\/?>/gi, '
+')
+    .replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '
+$1
+')
+    // Bold/italic — keep text
+    .replace(/<(strong|b)[^>]*>([\s\S]*?)<\/(strong|b)>/gi, '$2')
+    .replace(/<(em|i)[^>]*>([\s\S]*?)<\/(em|i)>/gi, '$2')
+    // Remove scripts, styles, nav, footer, header, aside entirely
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<nav[\s\S]*?<\/nav>/gi, '')
+    .replace(/<footer[\s\S]*?<\/footer>/gi, '')
+    .replace(/<header[\s\S]*?<\/header>/gi, '')
+    .replace(/<aside[\s\S]*?<\/aside>/gi, '')
+    // Strip remaining tags
+    .replace(/<[^>]+>/g, '')
+    // Decode entities
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&ndash;/g, '–')
+    .replace(/&mdash;/g, '—')
+    // Clean whitespace
+    .replace(/
+{3,}/g, '
+
+')
+    .trim();
+  return text;
+}
+
+function looksLikeHtml(text) {
+  return /<[a-z][\s\S]*>/i.test(text) && (text.includes('</') || text.includes('/>'));
+}
+
 // ─── Main App ────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -486,6 +560,30 @@ export default function App() {
   const [serpTitle, setSerpTitle] = useState("");
   const [serpDesc, setSerpDesc] = useState("");
   const [showSerp, setShowSerp] = useState(false);
+  const [htmlParsed, setHtmlParsed] = useState(false);
+  const [dark, setDark] = useState(true);
+
+  const t = dark ? {
+    bg: "#0a0a0f", surface: "rgba(255,255,255,0.04)", border: "rgba(255,255,255,0.08)",
+    text: "white", textMuted: "rgba(255,255,255,0.38)", textFaint: "rgba(255,255,255,0.2)",
+    input: "rgba(255,255,255,0.05)", inputBorder: "rgba(255,255,255,0.1)",
+    labelColor: "rgba(255,255,255,0.35)", tabInactive: "rgba(255,255,255,0.38)",
+    checkBg: "rgba(255,255,255,0.03)", checkNote: "rgba(255,255,255,0.4)",
+    checkLabel: "rgba(255,255,255,0.85)", sectionLabel: "rgba(255,255,255,0.3)",
+    winsBg: "rgba(168,85,247,0.06)", winsBorder: "rgba(168,85,247,0.15)",
+    diffBg: "rgba(168,85,247,0.04)", diffBorder: "rgba(168,85,247,0.15)",
+    toggleBg: "rgba(255,255,255,0.06)", toggleBorder: "rgba(255,255,255,0.12)", toggleText: "rgba(255,255,255,0.5)",
+  } : {
+    bg: "#f4f4f8", surface: "white", border: "rgba(0,0,0,0.08)",
+    text: "#111", textMuted: "rgba(0,0,0,0.5)", textFaint: "rgba(0,0,0,0.3)",
+    input: "white", inputBorder: "rgba(0,0,0,0.15)",
+    labelColor: "rgba(0,0,0,0.45)", tabInactive: "rgba(0,0,0,0.4)",
+    checkBg: "rgba(0,0,0,0.02)", checkNote: "rgba(0,0,0,0.45)", checkLabel: "#111",
+    sectionLabel: "rgba(0,0,0,0.35)",
+    winsBg: "rgba(168,85,247,0.06)", winsBorder: "rgba(168,85,247,0.2)",
+    diffBg: "rgba(168,85,247,0.03)", diffBorder: "rgba(168,85,247,0.2)",
+    toggleBg: "rgba(0,0,0,0.05)", toggleBorder: "rgba(0,0,0,0.1)", toggleText: "rgba(0,0,0,0.5)",
+  };
 
   const fetchUrl = useCallback(async () => {
     if (!url.trim()) return;
@@ -559,14 +657,14 @@ export default function App() {
   const wcLabel = wordCount < wc.low ? wc.lowLabel : wordCount < wc.good ? wc.midLabel : wc.goodLabel;
 
   // ─── Styles ─────────────────────────────────────────────────────────────────
-  const inputStyle = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "9px 12px", color: "white", fontSize: "13px", fontFamily: "'DM Mono', monospace", outline: "none", boxSizing: "border-box" };
-  const labelStyle = { display: "block", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.35)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "7px" };
-  const sectionLabel = (text, color = "rgba(255,255,255,0.3)") => (
-    <div style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color, letterSpacing: "0.15em", textTransform: "uppercase", margin: "18px 0 8px" }}>{text}</div>
+  const inputStyle = { width: "100%", background: t.input, border: `1px solid ${t.inputBorder}`, borderRadius: "8px", padding: "9px 12px", color: t.text, fontSize: "13px", fontFamily: "'DM Mono', monospace", outline: "none", boxSizing: "border-box" };
+  const labelStyle = { display: "block", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.labelColor, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "7px" };
+  const sectionLabel = (text, color) => (
+    <div style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: color || t.sectionLabel, letterSpacing: "0.15em", textTransform: "uppercase", margin: "18px 0 8px" }}>{text}</div>
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0f", color: "white", fontFamily: "Georgia, serif" }}>
+    <div style={{ minHeight: "100vh", background: t.bg, color: t.text, fontFamily: "Georgia, serif", transition: "background 0.3s, color 0.3s" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -589,22 +687,33 @@ export default function App() {
 
         {/* Header */}
         <div style={{ marginBottom: "clamp(24px, 4vw, 40px)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-            <div style={{ width: "26px", height: "26px", borderRadius: "7px", background: "linear-gradient(135deg, #6366f1, #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ width: "26px", height: "26px", borderRadius: "7px", background: "linear-gradient(135deg, #6366f1, #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </div>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: t.textMuted, textTransform: "uppercase" }}>DevKarhu</span>
             </div>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: "rgba(255,255,255,0.3)", textTransform: "uppercase" }}>DevKarhu</span>
+            <button onClick={() => setDark(d => !d)} style={{
+              display: "flex", alignItems: "center", gap: "6px",
+              padding: "6px 12px", borderRadius: "20px",
+              background: t.toggleBg, border: `1px solid ${t.toggleBorder}`,
+              color: t.toggleText, fontSize: "11px", fontFamily: "'DM Mono', monospace",
+              cursor: "pointer", transition: "all 0.2s"
+            }}>
+              {dark ? "☀ Vaalea" : "☾ Tumma"}
+            </button>
           </div>
           <h1 style={{ fontSize: "clamp(22px, 5vw, 36px)", fontWeight: "400", lineHeight: "1.1", letterSpacing: "-0.02em", marginBottom: "8px" }}>
             SEO <span style={{ color: "#6366f1" }}>&</span> GEO<br/>Analyzer
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.38)", fontSize: "clamp(13px, 2vw, 14px)", lineHeight: "1.6" }}>
+          <p style={{ color: t.textMuted, fontSize: "clamp(13px, 2vw, 14px)", lineHeight: "1.6" }}>
             Analysoi, optimoi ja paranna sisältöä — blogi, Instagram, Substack tai LinkedIn.
           </p>
         </div>
 
         {/* Input card */}
-        <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "16px" }}>
+        <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "16px" }}>
 
           {/* Content type selector */}
           <div style={{ marginBottom: "20px" }}>
@@ -656,16 +765,32 @@ export default function App() {
           {/* Content textarea */}
           <div style={{ marginBottom: "14px" }}>
             <div style={labelStyle}>Sisältö</div>
-            <textarea value={content} onChange={e => setContent(e.target.value)}
-              placeholder="Liitä teksti tähän..." rows={7} className="input-focus"
+            <textarea value={content} onChange={e => {
+                const val = e.target.value;
+                if (looksLikeHtml(val)) {
+                  setContent(parseHtml(val));
+                  setHtmlParsed(true);
+                } else {
+                  setContent(val);
+                  setHtmlParsed(false);
+                }
+              }}
+              placeholder="Liitä teksti tai HTML-lähdekoodi tähän — linkit ja kuvat säilytetään automaattisesti..." rows={7} className="input-focus"
               style={{ ...inputStyle, fontFamily: "Georgia, serif", fontSize: "14px", resize: "vertical", lineHeight: "1.6" }}
             />
+            {htmlParsed && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "5px" }}>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#22c55e" fillOpacity="0.2" stroke="#22c55e" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#22c55e" }}>HTML parsittu — linkit ja kuvat säilytetty</span>
+                <button onClick={() => { setHtmlParsed(false); }} style={{ marginLeft: "auto", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.textFaint, background: "none", border: "none", cursor: "pointer" }}>× poista</button>
+              </div>
+            )}
             {wordCount > 0 && (
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "5px" }}>
                 <span style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: wcColor, fontWeight: "600" }}>{wordCount} sanaa</span>
-                <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.2)" }}>—</span>
-                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)" }}>{wcLabel}</span>
-                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.15)", marginLeft: "auto" }}>tavoite {wc.target}</span>
+                <span style={{ fontSize: "10px", color: t.textFaint }}>—</span>
+                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.textMuted }}>{wcLabel}</span>
+                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.textFaint, marginLeft: "auto" }}>tavoite {wc.target}</span>
               </div>
             )}
           </div>
@@ -738,9 +863,9 @@ export default function App() {
           <div style={{ animation: "fadeIn 0.4s ease" }}>
 
             {/* Score rings */}
-            <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "12px" }}>
+            <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "12px" }}>
               <div style={{ textAlign: "center", marginBottom: "16px" }}>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: "rgba(255,255,255,0.25)", textTransform: "uppercase" }}>{result.title || "Analysoitu"}</span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: t.textFaint, textTransform: "uppercase" }}>{result.title || "Analysoitu"}</span>
               </div>
               <div className="scores-row" style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
                 <ScoreRing score={result.overallScore} label="Kokonais" color="#a855f7" />
@@ -752,7 +877,7 @@ export default function App() {
             </div>
 
             {/* Tabs */}
-            <div style={{ display: "flex", gap: "3px", marginBottom: "10px", background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "4px" }}>
+            <div style={{ display: "flex", gap: "3px", marginBottom: "10px", background: t.surface, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "4px" }}>
               {tabs.map(tab => (
                 <button key={tab.id} className="tab-btn" onClick={() => setActiveTab(tab.id)} style={{
                   background: activeTab === tab.id ? (tab.id === "compare" || tab.id === "beforeafter" ? "rgba(168,85,247,0.3)" : "rgba(99,102,241,0.3)") : "transparent",
@@ -763,7 +888,7 @@ export default function App() {
             </div>
 
             {/* Tab content */}
-            <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)" }}>
+            <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)" }}>
 
               {/* SEO / GEO / Keyword / E-E-A-T */}
               {["seo","geo","keyword","eeat"].includes(activeTab) && (() => {
@@ -804,7 +929,7 @@ export default function App() {
                   {sectionLabel("Quick Wins", "#a855f7")}
                   <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "16px" }}>Nopein hyöty pienimmällä vaivalla</div>
                   {result.quickWins.map((win, i) => (
-                    <div key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start", padding: "11px 13px", marginBottom: "6px", background: "rgba(168,85,247,0.06)", border: "1px solid rgba(168,85,247,0.15)", borderRadius: "10px" }}>
+                    <div key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start", padding: "11px 13px", marginBottom: "6px", background: t.winsBg, border: `1px solid ${t.winsBorder}`, borderRadius: "10px" }}>
                       <div style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Mono', monospace", fontSize: "9px", color: "#a855f7", fontWeight: "700" }}>{i+1}</div>
                       <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.75)", lineHeight: "1.5" }}>{win}</span>
                     </div>
@@ -881,7 +1006,7 @@ export default function App() {
                       <button onClick={useImproved} style={{ padding: "6px 12px", background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: "7px", color: "#c084fc", fontSize: "10px", fontFamily: "'DM Mono', monospace", cursor: "pointer", fontWeight: "600" }}>Käytä →</button>
                     </div>
                   </div>
-                  <div style={{ background: "rgba(168,85,247,0.04)", border: "1px solid rgba(168,85,247,0.15)", borderRadius: "12px", padding: "20px", fontSize: "14px", lineHeight: "1.8", color: "rgba(255,255,255,0.8)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                  <div style={{ background: t.diffBg, border: `1px solid ${t.diffBorder}`, borderRadius: "12px", padding: "20px", fontSize: "14px", lineHeight: "1.8", color: t.text, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
                     {renderDiff(improved)}
                   </div>
                 </div>
@@ -891,7 +1016,7 @@ export default function App() {
         )}
 
         <div style={{ marginTop: "40px", textAlign: "center" }}>
-          <span style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.12)", letterSpacing: "0.1em" }}>DEVKARHU · SEO & GEO ANALYZER</span>
+          <span style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: t.textFaint, letterSpacing: "0.1em" }}>DEVKARHU · SEO & GEO ANALYZER</span>
         </div>
       </div>
     </div>
