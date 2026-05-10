@@ -468,11 +468,11 @@ const ScoreRing = ({ score, label, color, small }) => {
 const CheckRow = ({ check }) => {
   const colors = { pass: "#22c55e", warn: "#f59e0b", fail: "#ef4444" };
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 12px", borderRadius: "8px", background: t.checkBg, borderLeft: `2px solid ${colors[check.status]}30`, marginBottom: "5px" }}>
+    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 12px", borderRadius: "8px", background: "#212121", borderLeft: `2px solid ${colors[check.status]}50`, marginBottom: "5px" }}>
       <div style={{ marginTop: "1px", flexShrink: 0 }}><StatusIcon status={check.status} /></div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: t.checkLabel, marginBottom: "2px" }}>{check.label}</div>
-        <div style={{ fontSize: "11px", color: t.checkNote, lineHeight: "1.4" }}>{check.note}</div>
+        <div style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: "#f0f0f8", marginBottom: "2px" }}>{check.label}</div>
+        <div style={{ fontSize: "11px", color: "rgba(240,240,248,0.55)", lineHeight: "1.4" }}>{check.note}</div>
       </div>
     </div>
   );
