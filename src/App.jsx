@@ -866,21 +866,20 @@ export default function App() {
             {/* Score rings */}
             <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "12px" }}>
               <div style={{ textAlign: "center", marginBottom: "16px" }}>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: t.textFaint, textTransform: "uppercase" }}>{result.title || "Analysoitu"}</span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: t.textFaint, textTransform: "uppercase" }}>{result?.title || "Analysoidaan..."}</span>
               </div>
               <div className="scores-row" style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
-                <ScoreRing score={result.overallScore} label="Kokonais" color="#a855f7" />
-                <ScoreRing score={result.seoScore} label="SEO" color="#6366f1" />
-                <ScoreRing score={result.geoScore} label="GEO" color="#06b6d4" />
-                {keyword && <ScoreRing score={result.keywordScore || 50} label="Avainsana" color="#f59e0b" />}
-                {result.eeat && <ScoreRing score={result.eeat.score || 50} label="E-E-A-T" color="#22c55e" />}
-                {result.cta && <ScoreRing score={result.cta.score || 50} label="CTA" color="#f97316" />}
-                {result.cta && <ScoreRing score={result.cta.score || 50} label="CTA" color="#f97316" />}
+                {result && <ScoreRing score={result.overallScore} label="Kokonais" color="#a855f7" />}
+                {result && <ScoreRing score={result.seoScore} label="SEO" color="#6366f1" />}
+                {result && <ScoreRing score={result.geoScore} label="GEO" color="#06b6d4" />}
+                {result && keyword && <ScoreRing score={result.keywordScore || 50} label="Avainsana" color="#f59e0b" />}
+                {result?.eeat && <ScoreRing score={result.eeat.score || 50} label="E-E-A-T" color="#22c55e" />}
+                {result?.cta && <ScoreRing score={result.cta.score || 50} label="CTA" color="#f97316" />}
               </div>
             </div>
 
             {/* Tabs */}
-            <div style={{ display: "flex", gap: "3px", marginBottom: "10px", background: t.surface, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "4px" }}>
+            {result && <div style={{ display: "flex", gap: "3px", marginBottom: "10px", background: t.surface, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "4px" }}>
               {tabs.map(tab => (
                 <button key={tab.id} className="tab-btn" onClick={() => setActiveTab(tab.id)} style={{
                   background: activeTab === tab.id ? (tab.id === "compare" || tab.id === "beforeafter" ? "rgba(168,85,247,0.3)" : "rgba(99,102,241,0.3)") : "transparent",
@@ -888,10 +887,9 @@ export default function App() {
                   color: activeTab === tab.id ? "white" : t.tabInactive,
                 }}>{tab.label}</button>
               ))}
-            </div>
+            </div>}
 
-            {/* Tab content */}
-            <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)" }}>
+            {result && <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)" }}>
 
               {/* SEO / GEO / Keyword / E-E-A-T */}
               {["seo","geo","keyword","eeat","cta"].includes(activeTab) && (() => {
@@ -1014,7 +1012,7 @@ export default function App() {
                   </div>
                 </div>
               )}
-            </div>
+            </div>}
           </div>
         )}
 
