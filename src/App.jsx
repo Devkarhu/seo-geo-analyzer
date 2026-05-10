@@ -719,17 +719,20 @@ export default function App() {
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #111111 !important; color: #f0f0f8; font-family: Georgia, serif; }
-    body { padding: 48px; max-width: 860px; margin: 0 auto; }
+    html { background: #111111; }
+    body { background: #111111; color: #f0f0f8; font-family: Georgia, serif; min-height: 100vh; }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 48px; background: #111111; }
     @media print {
-      html, body { background: #111111 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      body { padding: 24px; }
+      html, body, .wrap { background: #111111 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+      body { padding: 0; }
+      .wrap { padding: 24px; }
       .no-print { display: none !important; }
-      @page { margin: 1cm; size: A4; }
+      @page { margin: 0.8cm; size: A4; background: #111111; }
     }
   </style>
 </head>
 <body>
+<div class="wrap">
 
   <!-- Header -->
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.08)">
@@ -790,6 +793,7 @@ export default function App() {
       ⬇ Tallenna PDF
     </button>
   </div>
+</div>
 </body>
 </html>`;
 
