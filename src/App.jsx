@@ -618,7 +618,7 @@ export default function App() {
     setImproving(true); setImproved(null);
     const userMsg = `Content type: ${contentType}\nTarget keyword: "${keyword || "not specified"}"\n\nOriginal:\n${content}`;
     try {
-      const data = await callApi(IMPROVE_PROMPT, userMsg, "claude-haiku-4-5-20251001");
+      const data = await callApi(IMPROVE_PROMPT, userMsg);
       const text = data.content?.map(b => b.text || "").join("") || "";
       setImproved(text.trim());
       setActiveTab("compare");
