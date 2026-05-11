@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { systemPrompt, userMsg } = req.body;
+  const { systemPrompt, userMsg, model } = req.body;
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: model || "claude-sonnet-4-20250514",
       max_tokens: 4000,
       system: systemPrompt,
       messages: [{ role: "user", content: userMsg }],

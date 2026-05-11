@@ -487,11 +487,11 @@ const CONTENT_TYPES = [
   { id: "ecommerce", label: "E-commerce", icon: "🛒" },
 ];
 
-const callApi = async (systemPrompt, userMsg) => {
+const callApi = async (systemPrompt, userMsg, model) => {
   const res = await fetch("/api/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ systemPrompt, userMsg })
+    body: JSON.stringify({ systemPrompt, userMsg, model })
   });
   return res.json();
 };
@@ -611,7 +611,7 @@ export default function App() {
     setImproving(true); setImproved(null);
     const userMsg = `Content type: ${contentType}\nTarget keyword: "${keyword || "not specified"}"\n\nOriginal:\n${content}`;
     try {
-      const data = await callApi(IMPROVE_PROMPT, userMsg);
+      const data = await callApi(IMPROVE_PROMPT, userMsg, "claude-haiku-4-5-20251001");
       const text = data.content?.map(b => b.text || "").join("") || "";
       setImproved(text.trim());
       setActiveTab("compare");
