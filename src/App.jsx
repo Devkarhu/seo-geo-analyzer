@@ -39,6 +39,13 @@ Return ONLY valid JSON:
     "topIssues":["Add FAQ section","Add external citations","Add TL;DR block"]
   },
   "keyword": {
+    "searchIntent": {
+      "type": "informational",
+      "explanation": "Hakija haluaa oppia tai tutkia aihetta — ei vielä valmis ostamaan.",
+      "contentMatch": "pass",
+      "contentMatchNote": "Teksti vastaa hyvin informationaaliseen hakuaikomukseen.",
+      "suggestedKeywords": ["sähköpyörä aloittelijalle", "mikä sähköpyörä kannattaa ostaa", "sähköpyörä vertailu 2025"]
+    },
     "checks": [
       {"id":"kw_title","label":"Keyword in Title","status":"pass","note":"Keyword in H1."},
       {"id":"kw_intro","label":"Keyword in First 100 Words","status":"fail","note":"Missing from intro."},
@@ -649,8 +656,23 @@ export default function App() {
 
     const checksSection = (title, data, color) => {
       if (!data?.checks) return "";
+      const intentBlock = data.searchIntent ? (() => {
+        const si = data.searchIntent;
+        const intentColors = { informational: "#06b6d4", commercial: "#f59e0b", transactional: "#22c55e", navigational: "#a855f7" };
+        const ic = intentColors[si.type] || "#6366f1";
+        const mc = si.contentMatch === "pass" ? "#22c55e" : si.contentMatch === "warn" ? "#f59e0b" : "#ef4444";
+        return `<div style="padding:14px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid ${ic}25;margin-bottom:14px">
+          <div style="font-size:9px;font-family:monospace;color:${ic};letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">Hakuaikomus</div>
+          <div style="display:inline-block;padding:3px 10px;border-radius:20px;background:${ic}20;border:1px solid ${ic}40;font-size:11px;font-family:monospace;color:${ic};font-weight:600;margin-bottom:6px">${si.type?.toUpperCase()}</div>
+          <div style="font-size:12px;color:rgba(240,240,248,0.6);margin-bottom:8px;line-height:1.5">${si.explanation}</div>
+          <div style="font-size:11px;color:${mc};margin-bottom:8px">${si.contentMatch === "pass" ? "✓" : "⚠"} ${si.contentMatchNote}</div>
+          ${si.suggestedKeywords?.length ? `<div style="font-size:9px;font-family:monospace;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Ehdotetut avainsanat</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">${si.suggestedKeywords.map(kw => `<span style="padding:2px 8px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);font-size:10px;font-family:monospace;color:rgba(240,240,248,0.5)">${kw}</span>`).join("")}</div>` : ""}
+        </div>`;
+      })() : "";
       return `<div style="margin-bottom:28px">
         <div style="font-size:9px;font-family:monospace;color:${color};letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06)">${title}</div>
+        ${intentBlock}
         <div style="display:flex;gap:10px;margin-bottom:12px">
           <span style="font-size:16px;font-weight:700;color:#22c55e;font-family:monospace">${data.checks.filter(x=>x.status==="pass").length}</span><span style="font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;margin-top:5px">OK</span>
           <span style="margin:0 4px;color:rgba(255,255,255,0.1)">·</span>
@@ -1093,6 +1115,42 @@ export default function App() {
                   <div>
                     {sectionLabel(activeTab.toUpperCase(), color)}
                     <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "14px" }}>{tabLabelMap[activeTab]}</div>
+                    {activeTab === "keyword" && data.searchIntent && (() => {
+                      const si = data.searchIntent;
+                      const intentColors = { informational: "#06b6d4", commercial: "#f59e0b", transactional: "#22c55e", navigational: "#a855f7" };
+                      const intentLabels = { informational: "Informationaalinen — hakija haluaa oppia", commercial: "Kaupallinen — hakija vertailee vaihtoehtoja", transactional: "Transaktionaalinen — hakija on valmis ostamaan", navigational: "Navigaatio — hakija etsii tiettyä sivua" };
+                      const intentColor = intentColors[si.type] || "#6366f1";
+                      const matchColor = si.contentMatch === "pass" ? "#22c55e" : si.contentMatch === "warn" ? "#f59e0b" : "#ef4444";
+                      return (
+                        <div style={{ marginBottom: "20px", padding: "16px", background: t.checkBg, borderRadius: "10px", border: `1px solid ${intentColor}30` }}>
+                          <div style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: intentColor, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "10px" }}>Hakuaikomusanalyysi</div>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                            <div style={{ padding: "4px 10px", borderRadius: "20px", background: `${intentColor}20`, border: `1px solid ${intentColor}40`, fontSize: "11px", fontFamily: "'DM Mono', monospace", color: intentColor, fontWeight: "600" }}>
+                              {si.type?.toUpperCase()}
+                            </div>
+                            <div style={{ fontSize: "12px", color: t.textMuted }}>{intentLabels[si.type] || si.type}</div>
+                          </div>
+                          <div style={{ fontSize: "12px", color: t.textMuted, marginBottom: "10px", lineHeight: "1.5" }}>{si.explanation}</div>
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", padding: "8px 10px", background: `${matchColor}10`, borderRadius: "7px", border: `1px solid ${matchColor}25`, marginBottom: "12px" }}>
+                            <span style={{ color: matchColor, fontSize: "12px", fontWeight: "700", flexShrink: 0 }}>{si.contentMatch === "pass" ? "✓" : si.contentMatch === "warn" ? "⚠" : "✗"}</span>
+                            <div>
+                              <div style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: matchColor, marginBottom: "2px" }}>Sisältö vastaa hakuaikomusta</div>
+                              <div style={{ fontSize: "11px", color: t.textMuted, lineHeight: "1.4" }}>{si.contentMatchNote}</div>
+                            </div>
+                          </div>
+                          {si.suggestedKeywords?.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: t.sectionLabel, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "7px" }}>Ehdotetut long-tail avainsanat</div>
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                                {si.suggestedKeywords.map((kw, i) => (
+                                  <span key={i} style={{ padding: "3px 10px", borderRadius: "20px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", fontSize: "11px", fontFamily: "'DM Mono', monospace", color: t.textMuted }}>{kw}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                     <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", marginBottom: "14px" }}>
                       {[{count: passCount(data.checks), label:"OK", c:"#22c55e"},{count: warnCount(data.checks), label:"Varoitus", c:"#f59e0b"},{count: data.checks.length - passCount(data.checks) - warnCount(data.checks), label:"Ongelma", c:"#ef4444"}].map(s => (
                         <div key={s.label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
