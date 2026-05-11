@@ -396,6 +396,7 @@ ECOMMERCE / PRODUCT PAGE (conversion + SEO):
 - State warranty duration and service availability clearly
 - Use long-tail keywords naturally: e.g. "sähköpyörä kaupunkiajoon naisille", "sähköavusteinen pyörä 250W"
 - Do NOT use "revolutionary", "cutting-edge", "ultimate" — use specific facts instead
+- OPTIMAL LENGTH: 300–500 words. If the original is longer, cut ruthlessly — remove repetition, marketing fluff, redundant adjectives and filler sentences. A buyer needs facts, not prose. If under 300 words, expand with specs and use cases
 
 LINKEDIN (algorithm rules):
 - Total post: 1000–1300 characters optimal (hard limit before "see more" is ~210 chars)
