@@ -598,7 +598,8 @@ export default function App() {
       const data = await callApi(PROMPTS[contentType], userMsg);
       const raw = data.content?.map(b => b.text || "").join("") || "";
       const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-      setResult(prev => { if (prev) setBaseline(prev); return parsed; });
+      setResult(parsed);
+      setBaseline(prev => prev === null ? parsed : prev);
       setActiveTab("seo");
     } catch { setError("Analyysi epäonnistui. Tarkista syöte ja yritä uudelleen."); }
     finally { setLoading(false); }
@@ -804,6 +805,7 @@ export default function App() {
 
   const copyImproved = () => { navigator.clipboard.writeText(stripDiff(improved)); setCopied(true); setTimeout(() => setCopied(false), 2000); };
   const useImproved = () => { setContent(stripDiff(improved)); setImproved(null); setResult(null); setBaseline(null); setActiveTab("seo"); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const resetBaseline = () => { setBaseline(result); };
 
   const passCount = c => c?.filter(x => x.status === "pass").length || 0;
   const warnCount = c => c?.filter(x => x.status === "warn").length || 0;
@@ -1140,7 +1142,10 @@ export default function App() {
                 return (
                   <div>
                     {sectionLabel("↑ ENNEN / JÄLKEEN", "#a855f7")}
-                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "20px" }}>Pisteiden muutos ensimmäisestä analyysistä</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>Pisteiden muutos ensimmäisestä analyysistä</div>
+                      <button onClick={resetBaseline} style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "5px", padding: "4px 8px", cursor: "pointer" }}>↺ Nollaa vertailu</button>
+                    </div>
                     {metrics.map(m => {
                       const before = m.keyFn ? m.keyFn(baseline) : baseline[m.key];
                       const after = m.keyFn ? m.keyFn(result) : result[m.key];
