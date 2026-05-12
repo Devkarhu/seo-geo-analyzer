@@ -104,3 +104,8 @@ if (isProd) {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Serving static from: ${path.join(__dirname, "dist")}`);
+  console.log(`dist exists: ${fs.existsSync(path.join(__dirname, "dist"))}`);
+});
