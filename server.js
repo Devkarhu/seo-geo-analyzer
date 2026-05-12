@@ -88,7 +88,7 @@ app.post("/api/fetch-url", async (req, res) => {
 if (isProd) {
   // Production: serve built files
   app.use(express.static(path.join(__dirname, "dist")));
-  app.get("*", (req, res) => {
+  app.get("/{*splat}", (req, res) => {
     res.sendFile(path.join(__dirname, "dist", "index.html"));
   });
 } else {
