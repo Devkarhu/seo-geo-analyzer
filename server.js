@@ -34,8 +34,9 @@ app.post("/api/analyze", async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: "API call failed: " + err.message });
-  }
+  console.error("API error:", err.message);
+  res.status(500).json({ error: "API call failed: " + err.message });
+}
 });
 
 // API route — fetch url
