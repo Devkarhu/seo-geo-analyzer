@@ -885,11 +885,11 @@ export default function App() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#ffffff", color: "#111827", fontFamily: "Georgia, serif" }}>
+    <div style={{ minHeight: "100vh", background: "#faf7f0", color: "#111827", fontFamily: "Georgia, serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { margin: 0; background: #ffffff; }
+        body { margin: 0; background: #faf7f0; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         input, textarea { color: #111827 !important; background: #ffffff !important; }
