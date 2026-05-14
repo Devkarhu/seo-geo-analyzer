@@ -885,11 +885,11 @@ export default function App() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#faf7f0", color: "#111827", fontFamily: "Georgia, serif" }}>
+    <div style={{ minHeight: "100vh", background: "#ffffff", color: "#111827", fontFamily: "Georgia, serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { margin: 0; background: #faf7f0; }
+        body { margin: 0; background: #ffffff; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         input, textarea { color: #111827 !important; background: #ffffff !important; }
@@ -908,97 +908,77 @@ export default function App() {
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "clamp(20px, 5vw, 48px) clamp(12px, 4vw, 24px) 80px" }}>
 
         {/* Header */}
-        <div style={{ marginBottom: "28px", textAlign: "left" }}>
-          {/* Compact brand row */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
-            <div style={{ width: "26px", height: "26px", borderRadius: "7px", background: "linear-gradient(135deg, #6366f1, #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
+        <div style={{ marginBottom: "clamp(24px, 4vw, 40px)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ width: "26px", height: "26px", borderRadius: "7px", background: "linear-gradient(135deg, #6366f1, #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </div>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: "#6b7280", textTransform: "uppercase" }}>DevKarhu</span>
             </div>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px", fontWeight: "600", color: "#111827", letterSpacing: "-0.005em" }}>DevKarhu</span>
-            <span style={{ color: "#d1d5db", margin: "0 2px" }}>/</span>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "#6b7280" }}>SEO &amp; GEO Analyzer</span>
-          </div>
 
-          {/* Page heading — smaller, left-aligned, one job */}
-          <h1 style={{ fontSize: "clamp(22px, 3.5vw, 30px)", fontWeight: "400", lineHeight: "1.15", letterSpacing: "-0.02em", margin: "0 0 6px", color: "#111827" }}>
-            Uusi analyysi
+          </div>
+          <h1 style={{ fontSize: "clamp(26px, 5vw, 42px)", fontWeight: "800", lineHeight: "1.1", letterSpacing: "-0.02em", marginBottom: "8px", color: "#111827" }}>
+            <span style={{ color: "#111827" }}>SEO</span> <span style={{ color: "#4f46e5" }}>&</span> <span style={{ color: "#111827" }}>GEO</span><br/><span style={{ color: "#4f46e5" }}>Analyzer</span>
           </h1>
-          <p style={{ color: "#6b7280", fontSize: "14px", lineHeight: "1.55", margin: 0, maxWidth: "560px" }}>
-            Tarkista miten sisältösi pärjää sekä Googlessa että generatiivisessa haussa.
+          <p style={{ color: "#6b7280", fontSize: "clamp(13px, 2vw, 15px)", lineHeight: "1.6" }}>
+            Sisällöstä löydetyksi — SEO ja AI-optimointi yhdessä työkalussa.
           </p>
         </div>
 
         {/* Input card */}
-        <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "clamp(18px, 3vw, 24px)", marginBottom: "16px", boxShadow: "0 1px 2px rgba(0,0,0,0.04)", textAlign: "left" }}>
+        <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "16px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
 
-          {/* Content type — chip row, no big tiles */}
-          <div style={{ marginBottom: "18px" }}>
+          {/* Content type selector */}
+          <div style={{ marginBottom: "20px" }}>
             <div style={labelStyle}>Sisältötyyppi</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-              {CONTENT_TYPES.map(ct => {
-                const active = contentType === ct.id;
-                return (
-                  <button key={ct.id} onClick={() => { setContentType(ct.id); setResult(null); setBaseline(null); setImproved(null); }} style={{
-                    display: "inline-flex", alignItems: "center", gap: "8px",
-                    padding: "8px 14px", borderRadius: "999px", cursor: "pointer",
-                    border: `1px solid ${active ? "#4f46e5" : "#e5e7eb"}`,
-                    background: active ? "rgba(79,70,229,0.08)" : "#ffffff",
-                    color: active ? "#4f46e5" : "#374151",
-                    fontFamily: "'DM Mono', monospace", fontSize: "12px",
-                    fontWeight: active ? "700" : "500",
-                    letterSpacing: "0.02em",
-                    transition: "all 0.12s",
-                  }}>
-                    <span style={{ fontSize: "14px", lineHeight: 1 }}>{ct.icon}</span>
-                    <span>{ct.label}</span>
-                  </button>
-                );
-              })}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
+              {CONTENT_TYPES.map(t => (
+                <button key={t.id} onClick={() => { setContentType(t.id); setResult(null); setBaseline(null); setImproved(null); }} style={{
+                  padding: "10px 6px", borderRadius: "10px", border: "1px solid",
+                  borderColor: contentType === t.id ? "#4f46e5" : "#e5e7eb",
+                  background: contentType === t.id ? "#4f46e5" : "#f3f4f6",
+                  color: contentType === t.id ? "white" : "#374151",
+                  fontFamily: "'DM Mono', monospace", fontSize: "11px", cursor: "pointer",
+                  display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", transition: "all 0.15s"
+                }}>
+                  <span style={{ fontSize: "18px" }}>{t.icon}</span>
+                  <span style={{ fontSize: "11px", letterSpacing: "0.05em", fontWeight: "700" }}>{t.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* divider */}
-          <div style={{ height: 1, background: "#f3f4f6", margin: "0 0 18px" }} />
-
           {/* URL + Keyword */}
-          <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+          <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "14px" }}>
             <div>
-              <div style={labelStyle}>
-                URL <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "#9ca3af", marginLeft: 4 }}>valinnainen</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", border: "1px solid #d1d5db", borderRadius: "8px", background: "#ffffff", paddingLeft: "10px" }} className="input-focus-wrap">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" strokeWidth="1.3" style={{ flexShrink: 0 }}>
-                  <circle cx="8" cy="8" r="5.5"/>
-                  <path d="M2.5 8h11M8 2.5c1.8 2 1.8 9 0 11M8 2.5c-1.8 2-1.8 9 0 11"/>
-                </svg>
-                <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://omasivu.fi/artikkeli"
+              <div style={labelStyle}>URL (valinnainen)</div>
+              <div style={{ display: "flex", gap: "6px" }}>
+                <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="input-focus"
+                  style={{ ...inputStyle, flex: 1 }}
                   onKeyDown={e => e.key === "Enter" && fetchUrl()}
-                  style={{ flex: 1, minWidth: 0, border: "none", background: "transparent", padding: "10px 8px", fontFamily: "'DM Mono', monospace", fontSize: "13px", outline: "none", color: "#111827" }}
                 />
                 <button onClick={fetchUrl} disabled={!url.trim() || fetching} style={{
-                  border: "none", borderLeft: "1px solid #e5e7eb", background: "transparent",
-                  padding: "10px 14px", cursor: !url.trim() ? "not-allowed" : "pointer",
-                  fontSize: "12px", fontFamily: "'DM Mono', monospace",
-                  color: !url.trim() ? "#9ca3af" : "#4f46e5", fontWeight: "600",
-                  whiteSpace: "nowrap", letterSpacing: "0.02em"
-                }}>{fetching ? "..." : "Hae"}</button>
+                  padding: "9px 10px", background: !url.trim() ? "#f3f4f6" : "#ede9fe",
+                  border: "1px solid " + (!url.trim() ? "#e5e7eb" : "#c4b5fd"),
+                  borderRadius: "8px", color: !url.trim() ? "#9ca3af" : "#4f46e5",
+                  fontSize: "11px", fontFamily: "'DM Mono', monospace", cursor: !url.trim() ? "not-allowed" : "pointer", whiteSpace: "nowrap"
+                }}>
+                  {fetching ? "..." : "Hae"}
+                </button>
               </div>
             </div>
             <div>
-              <div style={labelStyle}>
-                Kohdeavainsana <span style={{ color: "#4f46e5", marginLeft: 2 }}>*</span>
-              </div>
-              <input value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="esim. talvipyöräily Helsinki" className="input-focus"
-                style={{ ...inputStyle, fontFamily: "Georgia, serif", fontSize: "14px", borderColor: "#c7d2fe" }}
+              <div style={labelStyle}>Kohdeavainsana <span style={{ color: "#f59e0b" }}>★</span></div>
+              <input value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="esim. talvipyöräily" className="input-focus"
+                style={{ ...inputStyle, borderColor: "#fde68a", background: "#fffbeb" }}
               />
             </div>
           </div>
 
           {/* Content textarea */}
           <div style={{ marginBottom: "14px" }}>
-            <div style={labelStyle}>
-              Sisältö <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "#9ca3af", marginLeft: 4 }}>teksti tai HTML</span>
-            </div>
+            <div style={labelStyle}>Sisältö</div>
             <textarea value={content} onChange={e => {
                 const val = e.target.value;
                 if (looksLikeHtml(val)) {
@@ -1009,58 +989,49 @@ export default function App() {
                   setHtmlParsed(false);
                 }
               }}
-              placeholder="Liitä artikkeli, kuvateksti tai HTML-lähdekoodi. Linkit, otsikot ja kuvat tunnistetaan automaattisesti." rows={8} className="input-focus"
-              style={{ ...inputStyle, fontFamily: "Georgia, serif", fontSize: "14px", resize: "vertical", lineHeight: "1.6", background: "#fafaf9", borderColor: "#e5e7eb" }}
+              placeholder="Liitä teksti tai HTML-lähdekoodi tähän — linkit ja kuvat säilytetään automaattisesti..." rows={7} className="input-focus"
+              style={{ ...inputStyle, fontFamily: "Georgia, serif", fontSize: "14px", resize: "vertical", lineHeight: "1.6" }}
             />
-            {/* Status row — htmlParsed badge OR word count, single line */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "7px", fontSize: "11px", fontFamily: "'DM Mono', monospace", minHeight: "16px" }}>
-              {htmlParsed ? (
-                <>
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}><circle cx="8" cy="8" r="7" fill="#22c55e" fillOpacity="0.2" stroke="#22c55e" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                  <span style={{ color: "#22c55e" }}>HTML parsittu — linkit ja kuvat säilytetty</span>
-                  <button onClick={() => setHtmlParsed(false)} style={{ marginLeft: "auto", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#9ca3af", background: "none", border: "none", cursor: "pointer" }}>× poista</button>
-                </>
-              ) : wordCount > 0 ? (
-                <>
-                  <span style={{ color: wcColor, fontWeight: "600" }}>{wordCount} sanaa</span>
-                  <span style={{ color: "#d1d5db" }}>·</span>
-                  <span style={{ color: "#6b7280" }}>{wcLabel}</span>
-                  <span style={{ color: "#9ca3af", marginLeft: "auto" }}>tavoite {wc.target}</span>
-                </>
-              ) : (
-                <span style={{ color: "#9ca3af" }}>0 sanaa</span>
-              )}
-            </div>
+            {htmlParsed && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "5px" }}>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#22c55e" fillOpacity="0.2" stroke="#22c55e" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#22c55e" }}>HTML parsittu — linkit ja kuvat säilytetty</span>
+                <button onClick={() => { setHtmlParsed(false); }} style={{ marginLeft: "auto", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.textFaint, background: "none", border: "none", cursor: "pointer" }}>× poista</button>
+              </div>
+            )}
+            {wordCount > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "5px" }}>
+                <span style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: wcColor, fontWeight: "600" }}>{wordCount} sanaa</span>
+                <span style={{ fontSize: "10px", color: "#9ca3af" }}>—</span>
+                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#6b7280" }}>{wcLabel}</span>
+                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#9ca3af", marginLeft: "auto" }}>tavoite {wc.target}</span>
+              </div>
+            )}
           </div>
 
-          {/* SERP Preview — collapsible disclosure */}
+          {/* SERP Preview toggle */}
           {contentType === "blog" && (
-            <div style={{ marginBottom: "18px" }}>
-              <button onClick={() => setShowSerp(s => !s)} style={{ background: "none", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "7px", padding: "4px 0" }}>
-                <svg width="10" height="10" viewBox="0 0 9 9" fill="none" style={{ transform: showSerp ? "rotate(90deg)" : "rotate(0)", transition: "0.2s" }}>
-                  <path d="M2 1.5l4 3-4 3" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <div style={{ marginBottom: "14px" }}>
+              <button onClick={() => setShowSerp(s => !s)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", padding: "0" }}>
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none" style={{ transform: showSerp ? "rotate(90deg)" : "rotate(0)", transition: "0.2s" }}>
+                  <path d="M2 1.5l4 3-4 3" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <span style={{ ...labelStyle, marginBottom: 0 }}>SERP-esikatselu</span>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", fontWeight: 400, color: "#9ca3af", textTransform: "none", letterSpacing: 0 }}>· miltä tulos näyttää Googlessa</span>
               </button>
               {showSerp && (
-                <div style={{ marginTop: "12px", padding: "14px", border: "1px solid #e5e7eb", borderRadius: "10px", background: "#fafaf9" }}>
-                  <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
+                <div style={{ marginTop: "10px" }}>
+                  <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "10px" }}>
                     <div>
-                      <div style={labelStyle}>
-                        Title <span style={{ color: serpTitle.length > 60 ? "#ef4444" : "#22c55e", fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>{serpTitle.length}/60</span>
-                      </div>
-                      <input value={serpTitle} onChange={e => setSerpTitle(e.target.value)} placeholder="Sivun otsikko..." className="input-focus" style={{ ...inputStyle, fontFamily: "Georgia, serif", fontSize: "14px" }}/>
+                      <div style={labelStyle}>Title <span style={{ color: serpTitle.length > 60 ? "#ef4444" : "#22c55e" }}>{serpTitle.length}/60</span></div>
+                      <input value={serpTitle} onChange={e => setSerpTitle(e.target.value)} placeholder="Sivun otsikko..." className="input-focus" style={inputStyle}/>
                     </div>
                     <div>
-                      <div style={labelStyle}>
-                        Meta description <span style={{ color: serpDesc.length > 160 ? "#ef4444" : serpDesc.length > 140 ? "#22c55e" : "#9ca3af", fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>{serpDesc.length}/160</span>
-                      </div>
-                      <input value={serpDesc} onChange={e => setSerpDesc(e.target.value)} placeholder="Meta description..." className="input-focus" style={{ ...inputStyle, fontFamily: "Georgia, serif", fontSize: "14px" }}/>
+                      <div style={labelStyle}>Meta description <span style={{ color: serpDesc.length > 160 ? "#ef4444" : serpDesc.length > 140 ? "#22c55e" : "rgba(255,255,255,0.2)" }}>{serpDesc.length}/160</span></div>
+                      <input value={serpDesc} onChange={e => setSerpDesc(e.target.value)} placeholder="Meta description..." className="input-focus" style={inputStyle}/>
                     </div>
                   </div>
-                  <div style={{ background: "white", borderRadius: "8px", padding: "12px 14px", border: "1px solid #e5e7eb", fontFamily: "Arial, sans-serif" }}>
-                    <div style={{ fontSize: "11px", color: "#4d5156", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url || "https://omasivu.fi/blogi/postaus"}</div>
+                  <div style={{ background: "white", borderRadius: "10px", padding: "14px 18px", fontFamily: "Arial, sans-serif" }}>
+                    <div style={{ fontSize: "11px", color: "#4d5156", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url || "https://sinunsivu.fi/blogi/postaus"}</div>
                     <div style={{ fontSize: "17px", color: serpTitle.length > 60 ? "#d93025" : "#1a0dab", lineHeight: "1.3", marginBottom: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {serpTitle || <span style={{ color: "#9aa0a6" }}>Kirjoita title yllä</span>}
                     </div>
@@ -1075,40 +1046,29 @@ export default function App() {
             </div>
           )}
 
-          {error && <div style={{ marginBottom: "12px", padding: "10px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", fontSize: "13px", color: "#dc2626", fontFamily: "Georgia, serif" }}>{error}</div>}
+          {error && <div style={{ marginBottom: "12px", padding: "10px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", fontSize: "13px", color: "#dc2626" }}>{error}</div>}
 
-          {/* Action row — primary CTA anchored right, paranna teksti secondary */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "16px", borderTop: "1px solid #f3f4f6", gap: "12px", flexWrap: "wrap" }}>
-            <div style={{ fontSize: "11px", color: "#9ca3af", fontFamily: "'DM Mono', monospace", letterSpacing: "0.02em" }}>
-              Analyysi vie 5–15 sekuntia
-            </div>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              <button onClick={improve} disabled={!content.trim() || improving || loading || analyzingImproved} style={{
-                padding: "10px 16px",
-                background: !content.trim() ? "#f9fafb" : improving ? "#ede9fe" : "#faf5ff",
-                border: "1px solid " + (!content.trim() ? "#e5e7eb" : "#d8b4fe"),
-                borderRadius: "8px",
-                color: !content.trim() ? "#9ca3af" : "#7c3aed",
-                fontSize: "12px", fontFamily: "'DM Mono', monospace", fontWeight: "600",
-                cursor: !content.trim() || improving || loading ? "not-allowed" : "pointer",
-                display: "inline-flex", alignItems: "center", gap: "6px",
-                letterSpacing: "0.02em",
-                transition: "all 0.12s"
-              }}>
-                {improving ? <><svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="#7c3aed" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round"/></svg>Parannetaan...</> : analyzingImproved ? <><svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="#7c3aed" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round"/></svg>Analysoidaan...</> : "✦ Paranna teksti"}
-              </button>
-              <button onClick={analyze} disabled={loading || improving} style={{
-                padding: "10px 20px", background: loading ? "#a5b4fc" : "#4f46e5",
-                border: "none", borderRadius: "8px", color: "white",
-                fontSize: "12px", fontFamily: "'DM Mono', monospace", fontWeight: "600",
-                cursor: loading || improving ? "not-allowed" : "pointer",
-                display: "inline-flex", alignItems: "center", gap: "8px",
-                letterSpacing: "0.02em",
-                boxShadow: "0 1px 0 rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.18)",
-              }}>
-                {loading ? <><svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>Analysoidaan...</> : <>Analysoi <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></>}
-              </button>
-            </div>
+          {/* Action buttons */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            <button onClick={analyze} disabled={loading || improving} style={{
+              padding: "12px", background: loading ? "#a5b4fc" : "#4f46e5",
+              border: "none", borderRadius: "10px", color: "white", fontSize: "13px",
+              fontFamily: "'DM Mono', monospace", fontWeight: "600", cursor: loading || improving ? "not-allowed" : "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: "6px"
+            }}>
+              {loading ? <><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>Analysoidaan...</> : "Analysoi →"}
+            </button>
+            <button onClick={improve} disabled={!content.trim() || improving || loading || analyzingImproved} style={{
+              padding: "12px",
+              background: improving ? "rgba(168,85,247,0.3)" : !content.trim() ? "rgba(255,255,255,0.04)" : "rgba(168,85,247,0.15)",
+              border: "1px solid " + (!content.trim() ? "rgba(255,255,255,0.07)" : "rgba(168,85,247,0.4)"),
+              borderRadius: "10px", color: !content.trim() ? "rgba(255,255,255,0.2)" : "#c084fc",
+              fontSize: "13px", fontFamily: "'DM Mono', monospace", fontWeight: "600",
+              cursor: !content.trim() || improving || loading ? "not-allowed" : "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: "6px"
+            }}>
+              {improving ? <><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="#c084fc" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="#c084fc" strokeWidth="2" strokeLinecap="round"/></svg>Parannetaan...</> : analyzingImproved ? <><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="#c084fc" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="#c084fc" strokeWidth="2" strokeLinecap="round"/></svg>Analysoidaan...</> : "✦ Paranna teksti"}
+            </button>
           </div>
         </div>
 
@@ -1287,13 +1247,27 @@ export default function App() {
                     {(() => {
                       const diff = result.overallScore - baseline.overallScore;
                       return (
-                        <div style={{ marginTop: "8px", padding: "14px", borderRadius: "10px", background: diff > 0 ? "rgba(34,197,94,0.07)" : diff < 0 ? "rgba(239,68,68,0.07)" : "rgba(255,255,255,0.03)", border: `1px solid ${diff > 0 ? "rgba(34,197,94,0.2)" : diff < 0 ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.07)"}` }}>
-                          <div style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: diff > 0 ? "#22c55e" : diff < 0 ? "#ef4444" : "rgba(255,255,255,0.4)", textAlign: "center" }}>
+                        <div style={{ marginTop: "8px", padding: "14px", borderRadius: "10px", background: diff > 0 ? "#f0fdf4" : diff < 0 ? "#fef2f2" : "#f9fafb", border: `1px solid ${diff > 0 ? "#bbf7d0" : diff < 0 ? "#fecaca" : "#e5e7eb"}` }}>
+                          <div style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: diff > 0 ? "#16a34a" : diff < 0 ? "#dc2626" : "#6b7280", textAlign: "center" }}>
                             {diff > 5 ? "✓ Merkittävä parannus" : diff > 0 ? "↑ Pieni parannus — jatka optimointia" : diff === 0 ? "→ Ei muutosta" : "↓ Pisteet laskivat — tarkista muutokset"}
                           </div>
                         </div>
                       );
                     })()}
+
+                    {/* Parannettu teksti raportin lopussa */}
+                    {improved && (
+                      <div style={{ marginTop: "28px" }}>
+                        <div style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: "#1e293b", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: "700", marginBottom: "12px" }}>Parannettu teksti</div>
+                        <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+                          <button onClick={copyImproved} style={{ padding: "6px 12px", background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: "7px", color: "#374151", fontSize: "10px", fontFamily: "'DM Mono', monospace", cursor: "pointer" }}>{copied ? "✓ Kopioitu" : "Kopioi teksti"}</button>
+                          <button onClick={useImproved} style={{ padding: "6px 12px", background: "#4f46e5", border: "none", borderRadius: "7px", color: "white", fontSize: "10px", fontFamily: "'DM Mono', monospace", cursor: "pointer", fontWeight: "600" }}>Käytä pohjana →</button>
+                        </div>
+                        <div style={{ background: "#fafaf9", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "20px", fontSize: "14px", lineHeight: "1.8", color: "#111827", whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "Georgia, serif" }}>
+                          {stripDiff(improved)}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })()}
