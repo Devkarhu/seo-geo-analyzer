@@ -919,7 +919,7 @@ export default function App() {
 
           </div>
           <h1 style={{ fontSize: "clamp(22px, 5vw, 36px)", fontWeight: "400", lineHeight: "1.1", letterSpacing: "-0.02em", marginBottom: "8px" }}>
-            <span style={{ color: "#111827" }}>SEO</span> <span style={{ color: "#4f46e5" }}>&</span> <span style={{ color: "#111827" }}>GEO</span><br/>Analyzer
+            <span style={{ color: "#111827" }}>SEO</span> <span style={{ color: "#4f46e5" }}>&</span> <span style={{ color: "#111827" }}>GEO</span><br/><span style={{ color: "#4f46e5" }}>Analyzer</span>
           </h1>
           <p style={{ color: "#6b7280", fontSize: "clamp(13px, 2vw, 15px)", lineHeight: "1.6" }}>
             Sisällöstä löydetyksi — SEO ja AI-optimointi yhdessä työkalussa.
