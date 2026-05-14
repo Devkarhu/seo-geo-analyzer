@@ -448,9 +448,9 @@ function stripDiff(text) {
 // ─── UI Components ───────────────────────────────────────────────────────────
 
 const StatusIcon = ({ status }) => {
-  if (status === "pass") return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#22c55e" fillOpacity="0.15" stroke="#22c55e" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-  if (status === "warn") return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" fill="#f59e0b" fillOpacity="0.15" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/><path d="M8 7v3M8 11.5v.5" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round"/></svg>;
-  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#ef4444" fillOpacity="0.15" stroke="#ef4444" strokeWidth="1.5"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/></svg>;
+  if (status === "pass") return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#16a34a" fillOpacity="0.1" stroke="#16a34a" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+  if (status === "warn") return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" fill="#d97706" fillOpacity="0.1" stroke="#d97706" strokeWidth="1.5" strokeLinejoin="round"/><path d="M8 7v3M8 11.5v.5" stroke="#d97706" strokeWidth="1.5" strokeLinecap="round"/></svg>;
+  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#dc2626" fillOpacity="0.1" stroke="#dc2626" strokeWidth="1.5"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#dc2626" strokeWidth="1.5" strokeLinecap="round"/></svg>;
 };
 
 const ScoreRing = ({ score, label, color, small }) => {
@@ -461,14 +461,14 @@ const ScoreRing = ({ score, label, color, small }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={cx} cy={cx} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6"/>
+        <circle cx={cx} cy={cx} r={r} fill="none" stroke="#e5e7eb" strokeWidth="6"/>
         <circle cx={cx} cy={cx} r={r} fill="none" stroke={color} strokeWidth="6"
           strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
           transform={`rotate(-90 ${cx} ${cx})`} style={{ transition: "stroke-dashoffset 1s ease" }}/>
-        <text x={cx} y={cx - 4} textAnchor="middle" fill="white" fontSize={small ? 13 : 16} fontWeight="700" fontFamily="'DM Mono', monospace">{score}</text>
-        <text x={cx} y={cx + 9} textAnchor="middle" fill="rgba(200,200,220,0.55)" fontSize="7" fontFamily="'DM Mono', monospace">/100</text>
+        <text x={cx} y={cx - 4} textAnchor="middle" fill="#111" fontSize={small ? 13 : 16} fontWeight="700" fontFamily="'DM Mono', monospace">{score}</text>
+        <text x={cx} y={cx + 9} textAnchor="middle" fill="#9ca3af" fontSize="7" fontFamily="'DM Mono', monospace">/100</text>
       </svg>
-      <span style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center" }}>{label}</span>
+      <span style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "#6b7280", letterSpacing: "0.08em", textTransform: "uppercase", textAlign: "center" }}>{label}</span>
     </div>
   );
 };
@@ -476,11 +476,11 @@ const ScoreRing = ({ score, label, color, small }) => {
 const CheckRow = ({ check }) => {
   const colors = { pass: "#22c55e", warn: "#f59e0b", fail: "#ef4444" };
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 12px", borderRadius: "8px", background: "#212121", borderLeft: `2px solid ${colors[check.status]}50`, marginBottom: "5px" }}>
+    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 12px", borderRadius: "8px", background: "#f9fafb", border: "1px solid #e5e7eb", borderLeft: `3px solid ${colors[check.status]}`, marginBottom: "5px" }}>
       <div style={{ marginTop: "1px", flexShrink: 0 }}><StatusIcon status={check.status} /></div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: "#f0f0f8", marginBottom: "2px" }}>{check.label}</div>
-        <div style={{ fontSize: "11px", color: "rgba(240,240,248,0.55)", lineHeight: "1.4" }}>{check.note}</div>
+        <div style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", color: "#111827", marginBottom: "2px" }}>{check.label}</div>
+        <div style={{ fontSize: "11px", color: "#6b7280", lineHeight: "1.4" }}>{check.note}</div>
       </div>
     </div>
   );
@@ -548,6 +548,7 @@ export default function App() {
   const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(false);
   const [improving, setImproving] = useState(false);
+  const [analyzingImproved, setAnalyzingImproved] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [result, setResult] = useState(null);
   const [baseline, setBaseline] = useState(null);
@@ -561,29 +562,29 @@ export default function App() {
   const [htmlParsed, setHtmlParsed] = useState(false);
 
   const t = {
-    bg: "#111111",
-    surface: "#1c1c1c",
-    surfaceHigh: "#242424",
-    border: "rgba(255,255,255,0.12)",
-    borderStrong: "rgba(255,255,255,0.18)",
-    text: "#f0f0f8",
-    textMuted: "rgba(240,240,248,0.6)",
-    textFaint: "rgba(240,240,248,0.35)",
-    input: "#161616",
-    inputBorder: "rgba(255,255,255,0.15)",
-    labelColor: "rgba(240,240,248,0.55)",
-    tabInactive: "rgba(240,240,248,0.5)",
-    checkBg: "#212121",
-    checkNote: "rgba(240,240,248,0.55)",
-    checkLabel: "#f0f0f8",
-    sectionLabel: "rgba(240,240,248,0.4)",
-    winsBg: "rgba(168,85,247,0.12)",
-    winsBorder: "rgba(168,85,247,0.3)",
-    diffBg: "rgba(168,85,247,0.08)",
-    diffBorder: "rgba(168,85,247,0.25)",
-    toggleBg: "rgba(255,255,255,0.08)",
-    toggleBorder: "rgba(255,255,255,0.15)",
-    toggleText: "rgba(240,240,248,0.6)",
+    bg: "#ffffff",
+    surface: "#f9fafb",
+    surfaceHigh: "#f3f4f6",
+    border: "#e5e7eb",
+    borderStrong: "#d1d5db",
+    text: "#111827",
+    textMuted: "#6b7280",
+    textFaint: "#9ca3af",
+    input: "#ffffff",
+    inputBorder: "#d1d5db",
+    labelColor: "#374151",
+    tabInactive: "#6b7280",
+    checkBg: "#f9fafb",
+    checkNote: "#6b7280",
+    checkLabel: "#111827",
+    sectionLabel: "#9ca3af",
+    winsBg: "#f5f3ff",
+    winsBorder: "#c4b5fd",
+    diffBg: "#faf5ff",
+    diffBorder: "#c4b5fd",
+    toggleBg: "#f3f4f6",
+    toggleBorder: "#e5e7eb",
+    toggleText: "#6b7280",
   };
 
   const fetchUrl = useCallback(async () => {
@@ -615,16 +616,31 @@ export default function App() {
 
   const improve = useCallback(async () => {
     if (!content.trim()) return;
+    // Lock baseline from current result before improving
+    setBaseline(prev => prev === null ? result : prev);
     setImproving(true); setImproved(null);
     const userMsg = `Content type: ${contentType}\nTarget keyword: "${keyword || "not specified"}"\n\nOriginal:\n${content}`;
     try {
       const data = await callApi(IMPROVE_PROMPT, userMsg);
       const text = data.content?.map(b => b.text || "").join("") || "";
-      setImproved(text.trim());
-      setActiveTab("compare");
+      const improvedText = text.trim();
+      setImproved(improvedText);
+
+      // Auto-analyze the improved text
+      setAnalyzingImproved(true);
+      const cleanText = improvedText
+        .replace(/\[\[DEL:[^\]]*\]\]/g, "")
+        .replace(/\[\[ADD:([^\]]*)\]\]/g, "$1")
+        .replace(/ {2,}/g, " ").trim();
+      const analyzeMsg = `Content type: ${contentType}\n${url ? `URL: ${url}\n` : ""}${keyword ? `Target keyword: ${keyword}\n` : ""}Content:\n${cleanText}`;
+      const analyzeData = await callApi(PROMPTS[contentType], analyzeMsg);
+      const raw = analyzeData.content?.map(b => b.text || "").join("") || "";
+      const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+      setResult(parsed);
+      setActiveTab("beforeafter");
     } catch { setError("Parantaminen epäonnistui."); }
-    finally { setImproving(false); }
-  }, [content, keyword, contentType]);
+    finally { setImproving(false); setAnalyzingImproved(false); }
+  }, [content, keyword, contentType, url, result]);
 
 
   const exportPdf = () => {
@@ -862,24 +878,25 @@ export default function App() {
   const wcLabel = wordCount < wc.low ? wc.lowLabel : wordCount < wc.good ? wc.midLabel : wc.goodLabel;
 
   // ─── Styles ─────────────────────────────────────────────────────────────────
-  const inputStyle = { width: "100%", background: t.input, border: `1px solid ${t.inputBorder}`, borderRadius: "8px", padding: "9px 12px", color: t.text, fontSize: "13px", fontFamily: "'DM Mono', monospace", outline: "none", boxSizing: "border-box" };
-  const labelStyle = { display: "block", fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.labelColor, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "7px" };
+  const inputStyle = { width: "100%", background: "#ffffff", border: "1px solid #d1d5db", borderRadius: "8px", padding: "10px 12px", color: "#111827", fontSize: "13px", fontFamily: "'DM Mono', monospace", outline: "none", boxSizing: "border-box" };
+  const labelStyle = { display: "block", fontSize: "11px", fontFamily: "'DM Mono', monospace", color: "#1e293b", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "8px", fontWeight: "700" };
   const sectionLabel = (text, color) => (
-    <div style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: color || t.sectionLabel, letterSpacing: "0.15em", textTransform: "uppercase", margin: "18px 0 8px" }}>{text}</div>
+    <div style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: color || "#1e293b", letterSpacing: "0.08em", textTransform: "uppercase", margin: "20px 0 10px", fontWeight: "700" }}>{text}</div>
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: t.bg, color: t.text, fontFamily: "Georgia, serif", transition: "background 0.3s, color 0.3s" }}>
+    <div style={{ minHeight: "100vh", background: "#ffffff", color: "#111827", fontFamily: "Georgia, serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { margin: 0; }
+        body { margin: 0; background: #ffffff; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.18) !important; }
-        ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-        .tab-btn { flex: 1; min-width: 0; padding: 7px 6px; border-radius: 7px; font-size: 10px; font-family: 'DM Mono', monospace; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; transition: all 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .input-focus:focus { border-color: rgba(99,102,241,0.5) !important; outline: none; }
+        input, textarea { color: #111827 !important; background: #ffffff !important; }
+        input::placeholder, textarea::placeholder { color: #9ca3af !important; }
+        ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+        .tab-btn { flex: 1; min-width: 0; padding: 8px 6px; border-radius: 7px; font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; transition: all 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .input-focus:focus { border-color: #6366f1 !important; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
         @media (max-width: 600px) {
           .grid-2 { grid-template-columns: 1fr !important; }
           .scores-row { gap: 12px !important; }
@@ -897,20 +914,20 @@ export default function App() {
               <div style={{ width: "26px", height: "26px", borderRadius: "7px", background: "linear-gradient(135deg, #6366f1, #a855f7)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
               </div>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: t.textMuted, textTransform: "uppercase" }}>DevKarhu</span>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: "#6b7280", textTransform: "uppercase" }}>DevKarhu</span>
             </div>
 
           </div>
           <h1 style={{ fontSize: "clamp(22px, 5vw, 36px)", fontWeight: "400", lineHeight: "1.1", letterSpacing: "-0.02em", marginBottom: "8px" }}>
-            SEO <span style={{ color: "#6366f1" }}>&</span> GEO<br/>Analyzer
+            SEO <span style={{ color: "#4f46e5" }}>&</span> GEO<br/>Analyzer
           </h1>
-          <p style={{ color: t.textMuted, fontSize: "clamp(13px, 2vw, 14px)", lineHeight: "1.6" }}>
+          <p style={{ color: "#6b7280", fontSize: "clamp(13px, 2vw, 15px)", lineHeight: "1.6" }}>
             Analysoi, optimoi ja paranna sisältöä — blogi, Instagram, Substack tai LinkedIn.
           </p>
         </div>
 
         {/* Input card */}
-        <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "16px" }}>
+        <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "16px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
 
           {/* Content type selector */}
           <div style={{ marginBottom: "20px" }}>
@@ -919,9 +936,9 @@ export default function App() {
               {CONTENT_TYPES.map(t => (
                 <button key={t.id} onClick={() => { setContentType(t.id); setResult(null); setBaseline(null); setImproved(null); }} style={{
                   padding: "10px 6px", borderRadius: "10px", border: "1px solid",
-                  borderColor: contentType === t.id ? "rgba(99,102,241,0.5)" : "rgba(255,255,255,0.08)",
-                  background: contentType === t.id ? "rgba(99,102,241,0.25)" : t.surfaceHigh,
-                  color: contentType === t.id ? "white" : t.textMuted,
+                  borderColor: contentType === t.id ? "#4f46e5" : "#e5e7eb",
+                  background: contentType === t.id ? "#4f46e5" : "#f3f4f6",
+                  color: contentType === t.id ? "white" : "#374151",
                   fontFamily: "'DM Mono', monospace", fontSize: "11px", cursor: "pointer",
                   display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", transition: "all 0.15s"
                 }}>
@@ -942,9 +959,9 @@ export default function App() {
                   onKeyDown={e => e.key === "Enter" && fetchUrl()}
                 />
                 <button onClick={fetchUrl} disabled={!url.trim() || fetching} style={{
-                  padding: "9px 10px", background: !url.trim() ? "rgba(255,255,255,0.03)" : "rgba(99,102,241,0.15)",
-                  border: "1px solid " + (!url.trim() ? "rgba(255,255,255,0.07)" : "rgba(99,102,241,0.35)"),
-                  borderRadius: "8px", color: !url.trim() ? "rgba(255,255,255,0.2)" : "#a5b4fc",
+                  padding: "9px 10px", background: !url.trim() ? "#f3f4f6" : "#ede9fe",
+                  border: "1px solid " + (!url.trim() ? "#e5e7eb" : "#c4b5fd"),
+                  borderRadius: "8px", color: !url.trim() ? "#9ca3af" : "#4f46e5",
                   fontSize: "11px", fontFamily: "'DM Mono', monospace", cursor: !url.trim() ? "not-allowed" : "pointer", whiteSpace: "nowrap"
                 }}>
                   {fetching ? "..." : "Hae"}
@@ -954,7 +971,7 @@ export default function App() {
             <div>
               <div style={labelStyle}>Kohdeavainsana <span style={{ color: "#f59e0b" }}>★</span></div>
               <input value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="esim. talvipyöräily" className="input-focus"
-                style={{ ...inputStyle, borderColor: "rgba(245,158,11,0.2)" }}
+                style={{ ...inputStyle, borderColor: "#fde68a", background: "#fffbeb" }}
               />
             </div>
           </div>
@@ -985,9 +1002,9 @@ export default function App() {
             {wordCount > 0 && (
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "5px" }}>
                 <span style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: wcColor, fontWeight: "600" }}>{wordCount} sanaa</span>
-                <span style={{ fontSize: "10px", color: t.textFaint }}>—</span>
-                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.textMuted }}>{wcLabel}</span>
-                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.textFaint, marginLeft: "auto" }}>tavoite {wc.target}</span>
+                <span style={{ fontSize: "10px", color: "#9ca3af" }}>—</span>
+                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#6b7280" }}>{wcLabel}</span>
+                <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#9ca3af", marginLeft: "auto" }}>tavoite {wc.target}</span>
               </div>
             )}
           </div>
@@ -997,7 +1014,7 @@ export default function App() {
             <div style={{ marginBottom: "14px" }}>
               <button onClick={() => setShowSerp(s => !s)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", padding: "0" }}>
                 <svg width="9" height="9" viewBox="0 0 9 9" fill="none" style={{ transform: showSerp ? "rotate(90deg)" : "rotate(0)", transition: "0.2s" }}>
-                  <path d="M2 1.5l4 3-4 3" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 1.5l4 3-4 3" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <span style={{ ...labelStyle, marginBottom: 0 }}>SERP-esikatselu</span>
               </button>
@@ -1029,19 +1046,19 @@ export default function App() {
             </div>
           )}
 
-          {error && <div style={{ marginBottom: "12px", padding: "10px 14px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: "8px", fontSize: "13px", color: "#fca5a5" }}>{error}</div>}
+          {error && <div style={{ marginBottom: "12px", padding: "10px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", fontSize: "13px", color: "#dc2626" }}>{error}</div>}
 
           {/* Action buttons */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
             <button onClick={analyze} disabled={loading || improving} style={{
-              padding: "12px", background: loading ? "rgba(99,102,241,0.3)" : "linear-gradient(135deg, #6366f1, #8b5cf6)",
+              padding: "12px", background: loading ? "#a5b4fc" : "#4f46e5",
               border: "none", borderRadius: "10px", color: "white", fontSize: "13px",
               fontFamily: "'DM Mono', monospace", fontWeight: "600", cursor: loading || improving ? "not-allowed" : "pointer",
               display: "flex", alignItems: "center", justifyContent: "center", gap: "6px"
             }}>
               {loading ? <><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="white" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>Analysoidaan...</> : "Analysoi →"}
             </button>
-            <button onClick={improve} disabled={!content.trim() || improving || loading} style={{
+            <button onClick={improve} disabled={!content.trim() || improving || loading || analyzingImproved} style={{
               padding: "12px",
               background: improving ? "rgba(168,85,247,0.3)" : !content.trim() ? "rgba(255,255,255,0.04)" : "rgba(168,85,247,0.15)",
               border: "1px solid " + (!content.trim() ? "rgba(255,255,255,0.07)" : "rgba(168,85,247,0.4)"),
@@ -1050,7 +1067,7 @@ export default function App() {
               cursor: !content.trim() || improving || loading ? "not-allowed" : "pointer",
               display: "flex", alignItems: "center", justifyContent: "center", gap: "6px"
             }}>
-              {improving ? <><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="#c084fc" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="#c084fc" strokeWidth="2" strokeLinecap="round"/></svg>Parannetaan...</> : "✦ Paranna teksti"}
+              {improving ? <><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="#c084fc" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="#c084fc" strokeWidth="2" strokeLinecap="round"/></svg>Parannetaan...</> : analyzingImproved ? <><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 1s linear infinite" }}><circle cx="8" cy="8" r="6" stroke="#c084fc" strokeWidth="2" strokeOpacity="0.3"/><path d="M8 2a6 6 0 0 1 6 6" stroke="#c084fc" strokeWidth="2" strokeLinecap="round"/></svg>Analysoidaan...</> : "✦ Paranna teksti"}
             </button>
           </div>
         </div>
@@ -1074,12 +1091,12 @@ export default function App() {
             )}
 
             {/* Score rings */}
-            <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "12px" }}>
+            <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", marginBottom: "12px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", color: t.textFaint, textTransform: "uppercase" }}>{result?.title || "Analysoidaan..."}</span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", color: "#6b7280", textTransform: "uppercase" }}>{result?.title || "Analysoidaan..."}</span>
                 {result && <button onClick={exportPdf} style={{
-                  padding: "5px 12px", background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)",
-                  borderRadius: "6px", color: "#a5b4fc", fontSize: "10px", fontFamily: "'DM Mono', monospace",
+                  padding: "5px 12px", background: "#ede9fe", border: "1px solid #c4b5fd",
+                  borderRadius: "6px", color: "#4f46e5", fontSize: "10px", fontFamily: "'DM Mono', monospace",
                   cursor: "pointer", letterSpacing: "0.05em", fontWeight: "600"
                 }}>⬇ PDF</button>}
               </div>
@@ -1097,14 +1114,14 @@ export default function App() {
             {result && <div style={{ display: "flex", gap: "3px", marginBottom: "10px", background: t.surface, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "4px" }}>
               {tabs.map(tab => (
                 <button key={tab.id} className="tab-btn" onClick={() => setActiveTab(tab.id)} style={{
-                  background: activeTab === tab.id ? (tab.id === "compare" || tab.id === "beforeafter" ? "rgba(168,85,247,0.3)" : "rgba(99,102,241,0.3)") : "transparent",
-                  border: "1px solid " + (activeTab === tab.id ? (tab.id === "compare" || tab.id === "beforeafter" ? "rgba(168,85,247,0.4)" : "rgba(99,102,241,0.4)") : "transparent"),
-                  color: activeTab === tab.id ? "white" : t.tabInactive,
+                  background: activeTab === tab.id ? (tab.id === "compare" || tab.id === "beforeafter" ? "#7c3aed" : "#4f46e5") : "transparent",
+                  border: "1px solid " + (activeTab === tab.id ? (tab.id === "compare" || tab.id === "beforeafter" ? "#7c3aed" : "#4f46e5") : "transparent"),
+                  color: activeTab === tab.id ? "white" : "#6b7280",
                 }}>{tab.label}</button>
               ))}
             </div>}
 
-            {result && <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)" }}>
+            {result && <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "16px", padding: "clamp(16px, 4vw, 24px)", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
 
               {/* SEO / GEO / Keyword / E-E-A-T */}
               {["seo","geo","keyword","eeat","cta"].includes(activeTab) && (() => {
@@ -1114,7 +1131,7 @@ export default function App() {
                 return (
                   <div>
                     {sectionLabel(activeTab.toUpperCase(), color)}
-                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "14px" }}>{tabLabelMap[activeTab]}</div>
+                    <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "14px" }}>{tabLabelMap[activeTab]}</div>
                     {activeTab === "keyword" && data.searchIntent && (() => {
                       const si = data.searchIntent;
                       const intentColors = { informational: "#06b6d4", commercial: "#f59e0b", transactional: "#22c55e", navigational: "#a855f7" };
@@ -1122,10 +1139,10 @@ export default function App() {
                       const intentColor = intentColors[si.type] || "#6366f1";
                       const matchColor = si.contentMatch === "pass" ? "#22c55e" : si.contentMatch === "warn" ? "#f59e0b" : "#ef4444";
                       return (
-                        <div style={{ marginBottom: "20px", padding: "16px", background: t.checkBg, borderRadius: "10px", border: `1px solid ${intentColor}30` }}>
+                        <div style={{ marginBottom: "20px", padding: "16px", background: "#f9fafb", borderRadius: "10px", border: `1px solid ${intentColor}25`, borderLeft: `3px solid ${intentColor}` }}>
                           <div style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: intentColor, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "10px" }}>Hakuaikomusanalyysi</div>
                           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                            <div style={{ padding: "4px 10px", borderRadius: "20px", background: `${intentColor}20`, border: `1px solid ${intentColor}40`, fontSize: "11px", fontFamily: "'DM Mono', monospace", color: intentColor, fontWeight: "600" }}>
+                            <div style={{ padding: "4px 10px", borderRadius: "20px", background: `${intentColor}15`, border: `1px solid ${intentColor}30`, fontSize: "11px", fontFamily: "'DM Mono', monospace", color: intentColor, fontWeight: "600" }}>
                               {si.type?.toUpperCase()}
                             </div>
                             <div style={{ fontSize: "12px", color: t.textMuted }}>{intentLabels[si.type] || si.type}</div>
@@ -1143,7 +1160,7 @@ export default function App() {
                               <div style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: t.sectionLabel, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "7px" }}>Ehdotetut long-tail avainsanat</div>
                               <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                                 {si.suggestedKeywords.map((kw, i) => (
-                                  <span key={i} style={{ padding: "3px 10px", borderRadius: "20px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", fontSize: "11px", fontFamily: "'DM Mono', monospace", color: t.textMuted }}>{kw}</span>
+                                  <span key={i} style={{ padding: "4px 10px", borderRadius: "20px", background: "#f3f4f6", border: "1px solid #e5e7eb", fontSize: "11px", fontFamily: "'DM Mono', monospace", color: "#374151" }}>{kw}</span>
                                 ))}
                               </div>
                             </div>
@@ -1181,7 +1198,7 @@ export default function App() {
                   {sectionLabel("Quick Wins", "#a855f7")}
                   <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "16px" }}>Nopein hyöty pienimmällä vaivalla</div>
                   {result.quickWins.map((win, i) => (
-                    <div key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start", padding: "11px 13px", marginBottom: "6px", background: t.winsBg, border: `1px solid ${t.winsBorder}`, borderRadius: "10px" }}>
+                    <div key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start", padding: "11px 13px", marginBottom: "6px", background: "#f5f3ff", border: "1px solid #ddd6fe", borderRadius: "10px" }}>
                       <div style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Mono', monospace", fontSize: "9px", color: "#a855f7", fontWeight: "700" }}>{i+1}</div>
                       <span style={{ fontSize: "13px", color: t.text, lineHeight: "1.5" }}>{win}</span>
                     </div>
@@ -1216,7 +1233,7 @@ export default function App() {
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "6px" }}>
                             <span style={{ fontSize: "11px", fontFamily: "'DM Mono', monospace", color: t.textMuted }}>{m.label}</span>
                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                              <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: t.textFaint }}>{before} → {after}</span>
+                              <span style={{ fontSize: "10px", fontFamily: "'DM Mono', monospace", color: "#9ca3af" }}>{before} → {after}</span>
                               <span style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", fontWeight: "700", color: diffColor }}>{diff > 0 ? "+" : ""}{diff}</span>
                             </div>
                           </div>
@@ -1257,11 +1274,11 @@ export default function App() {
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-                      <button onClick={copyImproved} style={{ padding: "6px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "7px", color: "rgba(255,255,255,0.65)", fontSize: "10px", fontFamily: "'DM Mono', monospace", cursor: "pointer" }}>{copied ? "✓ Kopioitu" : "Kopioi"}</button>
-                      <button onClick={useImproved} style={{ padding: "6px 12px", background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: "7px", color: "#c084fc", fontSize: "10px", fontFamily: "'DM Mono', monospace", cursor: "pointer", fontWeight: "600" }}>Käytä →</button>
+                      <button onClick={copyImproved} style={{ padding: "6px 12px", background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: "7px", color: "#374151", fontSize: "10px", fontFamily: "'DM Mono', monospace", cursor: "pointer" }}>{copied ? "✓ Kopioitu" : "Kopioi"}</button>
+                      <button onClick={useImproved} style={{ padding: "6px 12px", background: "#4f46e5", border: "none", borderRadius: "7px", color: "white", fontSize: "10px", fontFamily: "'DM Mono', monospace", cursor: "pointer", fontWeight: "600" }}>Käytä →</button>
                     </div>
                   </div>
-                  <div style={{ background: t.diffBg, border: `1px solid ${t.diffBorder}`, borderRadius: "12px", padding: "20px", fontSize: "14px", lineHeight: "1.8", color: t.text, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                  <div style={{ background: "#faf5ff", border: "1px solid #ddd6fe", borderRadius: "12px", padding: "20px", fontSize: "14px", lineHeight: "1.8", color: "#111827", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
                     {renderDiff(improved)}
                   </div>
                 </div>
@@ -1271,7 +1288,7 @@ export default function App() {
         )}
 
         <div style={{ marginTop: "40px", textAlign: "center" }}>
-          <span style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: t.textFaint, letterSpacing: "0.1em" }}>DEVKARHU · SEO & GEO ANALYZER</span>
+          <span style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "#9ca3af", letterSpacing: "0.1em" }}>DEVKARHU · SEO & GEO ANALYZER</span>
         </div>
       </div>
     </div>
