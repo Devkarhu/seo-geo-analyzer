@@ -943,7 +943,7 @@ export default function App() {
                   display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", transition: "all 0.15s"
                 }}>
                   <span style={{ fontSize: "18px" }}>{t.icon}</span>
-                  <span style={{ fontSize: "10px", letterSpacing: "0.05em" }}>{t.label}</span>
+                  <span style={{ fontSize: "11px", letterSpacing: "0.05em", fontWeight: "700" }}>{t.label}</span>
                 </button>
               ))}
             </div>
