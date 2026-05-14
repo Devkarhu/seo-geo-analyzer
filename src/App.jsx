@@ -922,7 +922,7 @@ export default function App() {
             <span style={{ color: "#111827" }}>SEO</span> <span style={{ color: "#4f46e5" }}>&</span> <span style={{ color: "#111827" }}>GEO</span><br/>Analyzer
           </h1>
           <p style={{ color: "#6b7280", fontSize: "clamp(13px, 2vw, 15px)", lineHeight: "1.6" }}>
-            Analysoi, optimoi ja paranna sisältöä — blogi, Instagram, Substack tai LinkedIn.
+            Sisällöstä löydetyksi — SEO ja AI-optimointi yhdessä työkalussa.
           </p>
         </div>
 
