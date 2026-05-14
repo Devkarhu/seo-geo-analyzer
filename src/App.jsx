@@ -432,8 +432,8 @@ function renderDiff(text) {
     if (match.index > last) parts.push(<span key={key++}>{text.slice(last, match.index)}</span>);
     const [, type, val] = match;
     parts.push(type === "ADD"
-      ? <mark key={key++} style={{ background: "rgba(34,197,94,0.25)", color: "#86efac", borderRadius: "3px", padding: "1px 3px", borderBottom: "2px solid rgba(34,197,94,0.6)" }}>{val}</mark>
-      : <span key={key++} style={{ background: "rgba(239,68,68,0.2)", color: "rgba(252,165,165,0.7)", borderRadius: "3px", padding: "1px 3px", textDecoration: "line-through", textDecorationColor: "rgba(239,68,68,0.7)" }}>{val}</span>
+      ? <mark key={key++} style={{ background: "#dcfce7", color: "#15803d", borderRadius: "3px", padding: "1px 3px", borderBottom: "2px solid #86efac" }}>{val}</mark>
+      : <span key={key++} style={{ background: "#fee2e2", color: "#b91c1c", borderRadius: "3px", padding: "1px 3px", textDecoration: "line-through", textDecorationColor: "#f87171" }}>{val}</span>
     );
     last = match.index + match[0].length;
   }
@@ -823,6 +823,12 @@ export default function App() {
   ${result.eeat ? checksSection("E-E-A-T — Experience · Expertise · Authoritativeness · Trust", result.eeat, "#22c55e") : ""}
   ${result.cta ? checksSection("CTA — Call-to-Action & Ostopolku", result.cta, "#f97316") : ""}
 
+  <!-- Parannettu teksti PDF:ssä -->
+  ${improved ? `<div style="background:#1c1c1c;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:24px;margin-bottom:24px">
+    <div style="font-size:9px;font-family:'DM Mono',monospace;color:#a855f7;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px">Parannettu teksti</div>
+    <div style="font-size:14px;line-height:1.8;color:#f0f0f8;white-space:pre-wrap;word-break:break-word;font-family:Georgia,serif">${improved.replace(/\[\[DEL:[^\]]*\]\]/g,"").replace(/\[\[ADD:([^\]]*)\]\]/g,"$1").replace(/ {2,}/g," ").trim()}</div>
+  </div>` : ""}
+
   <!-- Footer -->
   <div style="margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);text-align:center">
     <span style="font-size:9px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.15);letter-spacing:0.1em">DEVKARHU · SEO & GEO ANALYZER · ${now}</span>
@@ -855,7 +861,6 @@ export default function App() {
     { id: "keyword", label: "Avainsana" },
     { id: "eeat", label: "E-E-A-T" },
     { id: "wins", label: "Wins" },
-    ...(result?.cta ? [{ id: "cta", label: "CTA" }] : []),
     ...(result?.cta ? [{ id: "cta", label: "CTA" }] : []),
     ...(baseline ? [{ id: "beforeafter", label: "↑ Muutos" }] : []),
     ...(improved ? [{ id: "compare", label: "✦ Diff" }] : []),
@@ -1172,7 +1177,7 @@ export default function App() {
                       {[{count: passCount(data.checks), label:"OK", c:"#22c55e"},{count: warnCount(data.checks), label:"Varoitus", c:"#f59e0b"},{count: data.checks.length - passCount(data.checks) - warnCount(data.checks), label:"Ongelma", c:"#ef4444"}].map(s => (
                         <div key={s.label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                           <span style={{ fontSize: "16px", fontFamily: "'DM Mono', monospace", fontWeight: "700", color: s.c }}>{s.count}</span>
-                          <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.3)", fontFamily: "'DM Mono', monospace" }}>{s.label}</span>
+                          <span style={{ fontSize: "9px", color: "#6b7280", fontFamily: "'DM Mono', monospace" }}>{s.label}</span>
                         </div>
                       ))}
                     </div>
@@ -1196,7 +1201,7 @@ export default function App() {
               {activeTab === "wins" && result.quickWins && (
                 <div>
                   {sectionLabel("Quick Wins", "#a855f7")}
-                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginBottom: "16px" }}>Nopein hyöty pienimmällä vaivalla</div>
+                  <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "16px" }}>Nopein hyöty pienimmällä vaivalla</div>
                   {result.quickWins.map((win, i) => (
                     <div key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start", padding: "11px 13px", marginBottom: "6px", background: "#f5f3ff", border: "1px solid #ddd6fe", borderRadius: "10px" }}>
                       <div style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Mono', monospace", fontSize: "9px", color: "#a855f7", fontWeight: "700" }}>{i+1}</div>
@@ -1219,8 +1224,8 @@ export default function App() {
                   <div>
                     {sectionLabel("↑ ENNEN / JÄLKEEN", "#a855f7")}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>Pisteiden muutos ensimmäisestä analyysistä</div>
-                      <button onClick={resetBaseline} style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "5px", padding: "4px 8px", cursor: "pointer" }}>↺ Nollaa vertailu</button>
+                      <div style={{ fontSize: "11px", color: "#6b7280" }}>Pisteiden muutos ensimmäisestä analyysistä</div>
+                      <button onClick={resetBaseline} style={{ fontSize: "9px", fontFamily: "'DM Mono', monospace", color: "#6b7280", background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: "5px", padding: "4px 8px", cursor: "pointer" }}>↺ Nollaa vertailu</button>
                     </div>
                     {metrics.map(m => {
                       const before = m.keyFn ? m.keyFn(baseline) : baseline[m.key];
@@ -1237,8 +1242,8 @@ export default function App() {
                               <span style={{ fontSize: "12px", fontFamily: "'DM Mono', monospace", fontWeight: "700", color: diffColor }}>{diff > 0 ? "+" : ""}{diff}</span>
                             </div>
                           </div>
-                          <div style={{ position: "relative", height: "6px", borderRadius: "3px", background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-                            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${before}%`, background: "rgba(255,255,255,0.2)", borderRadius: "3px" }}/>
+                          <div style={{ position: "relative", height: "6px", borderRadius: "3px", background: "#e5e7eb", overflow: "hidden" }}>
+                            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${before}%`, background: "#d1d5db", borderRadius: "3px" }}/>
                             <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${after}%`, background: m.color, borderRadius: "3px", opacity: 0.7, transition: "width 0.8s ease" }}/>
                           </div>
                         </div>
@@ -1279,10 +1284,10 @@ export default function App() {
                     <div>
                       {sectionLabel("✦ PARANNETTU — muutokset korostettu", "#a855f7")}
                       <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
-                        {[{c:"rgba(34,197,94,0.3)",b:"rgba(34,197,94,0.5)",l:"Lisätty"},{c:"rgba(239,68,68,0.2)",b:"rgba(239,68,68,0.4)",l:"Poistettu"}].map(s => (
+                        {[{c:"#dcfce7",b:"#86efac",l:"Lisätty"},{c:"#fee2e2",b:"#fca5a5",l:"Poistettu"}].map(s => (
                           <div key={s.l} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                             <span style={{ width: "10px", height: "10px", borderRadius: "2px", background: s.c, border: `1px solid ${s.b}`, display: "inline-block" }}/>
-                            <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)", fontFamily: "'DM Mono', monospace" }}>{s.l}</span>
+                            <span style={{ fontSize: "10px", color: "#6b7280", fontFamily: "'DM Mono', monospace" }}>{s.l}</span>
                           </div>
                         ))}
                       </div>
